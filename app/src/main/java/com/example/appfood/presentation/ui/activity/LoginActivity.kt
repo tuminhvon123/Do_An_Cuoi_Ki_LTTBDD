@@ -1,4 +1,4 @@
-package com.example.appfood
+package com.example.appfood.presentation.ui.activity
 
 import android.os.Bundle
 import android.widget.Button
@@ -7,7 +7,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
+import com.example.appfood.R
 
+@AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
     // 1. Khai báo các "Biến" đại diện cho giao diện

@@ -13,3 +13,28 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Kotlin-specific
+.kotlin/
+
+# Log files
+*.log
+
+# Android Studio
+*.ipr
+*.iws
+.idea/
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Build artifacts
+build/
+app/build/
+bin/
+gen/
+
+# System specific
+.DS_Store
+Thumbs.db

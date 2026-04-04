@@ -1,14 +1,14 @@
-package com.example.appfood.adapter
+package com.example.appfood.presentation.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.appfood.databinding.ItemCategoryBinding
-import com.example.appfood.model.Category
+import com.example.appfood.domain.model.Category
 
 class CategoryAdapter(
-    private val items: List<Category>,
+    private var items: List<Category>,
     private val onItemClick: (Category) -> Unit
 ) : RecyclerView.Adapter<CategoryAdapter.ViewHolder>() {
 
@@ -32,4 +32,10 @@ class CategoryAdapter(
     }
 
     override fun getItemCount(): Int = items.size
+
+    // Hàm cập nhật danh sách (cho chức năng lọc)
+    fun updateList(newList: List<Category>) {
+        items = newList
+        notifyDataSetChanged()
+    }
 }

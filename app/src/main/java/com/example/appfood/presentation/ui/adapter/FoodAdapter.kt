@@ -1,4 +1,4 @@
-package com.example.appfood.adapter
+package com.example.appfood.presentation.ui.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,8 +6,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.appfood.databinding.ItemFoodBinding
-import com.example.appfood.model.Food
-import java.text.DecimalFormat
+import com.example.appfood.domain.model.Food
+import com.example.appfood.util.Extensions.formatCurrency
 
 class FoodAdapter(
     private var items: List<Food>,
@@ -27,8 +27,7 @@ class FoodAdapter(
         holder.binding.tvFoodTitle.text = item.title
         
         // Định dạng giá tiền: 50,000 VNĐ
-        val decimalFormat = DecimalFormat("#,###")
-        holder.binding.tvFoodPrice.text = "${decimalFormat.format(item.price)} VNĐ"
+        holder.binding.tvFoodPrice.text = item.price.formatCurrency()
         
         // Hiển thị trạng thái Hết hàng (Sold Out) - Một yêu cầu trong task của bạn
         if (item.isSoldOut) {

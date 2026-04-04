@@ -1,4 +1,4 @@
-package com.example.appfood
+package com.example.appfood.presentation.ui.activity
 
 import android.content.Intent
 import android.os.Bundle
@@ -7,17 +7,25 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.widget.ViewPager2
-import com.example.appfood.adapter.BannerAdapter
-import com.example.appfood.adapter.CategoryAdapter
-import com.example.appfood.adapter.FoodAdapter
+import com.example.appfood.presentation.ui.adapter.BannerAdapter
+import com.example.appfood.presentation.ui.adapter.CategoryAdapter
+import com.example.appfood.presentation.ui.adapter.FoodAdapter
 import com.example.appfood.databinding.ActivityMainBinding
-import com.example.appfood.model.Category
-import com.example.appfood.model.Food
+import com.example.appfood.domain.model.Category
+import com.example.appfood.domain.model.Food
+import com.example.appfood.presentation.viewmodel.MainViewModel
+import com.example.appfood.util.Constants
+import com.example.appfood.R
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -27,11 +35,7 @@ class MainActivity : AppCompatActivity() {
     
     private var foodList = mutableListOf<Food>()
     private var categoryList = mutableListOf<Category>()
-    private var bannerImages = listOf(
-        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&auto=format",
-        "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&auto=format",
-        "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=800&auto=format"
-    )
+    private var bannerImages = Constants.BANNER_IMAGES
 
     private val sliderHandler = Handler(Looper.getMainLooper())
     private val sliderRunnable = Runnable {
@@ -69,7 +73,7 @@ class MainActivity : AppCompatActivity() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
                 sliderHandler.removeCallbacks(sliderRunnable)
-                sliderHandler.postDelayed(sliderRunnable, 3000)
+                sliderHandler.postDelayed(sliderRunnable, Constants.SLIDER_DELAY)
             }
         })
     }
@@ -129,6 +133,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        sliderHandler.postDelayed(sliderRunnable, 3000)
+        sliderHandler.postDelayed(sliderRunnable, Constants.SLIDER_DELAY)
     }
 }

@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".AppFoodApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -15,12 +16,12 @@
         android:theme="@style/Theme.AppFood">
 
         <activity
-            android:name=".DetailActivity"
+            android:name=".presentation.ui.activity.DetailActivity"
             android:exported="false" />
 
-        <activity android:name=".MainActivity" />
+        <activity android:name=".presentation.ui.activity.MainActivity" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".presentation.ui.activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

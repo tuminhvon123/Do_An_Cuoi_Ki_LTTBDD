@@ -2,16 +2,18 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.hilt.android)
+    kotlin("kapt")
 }
 
 android {
     namespace = "com.example.appfood"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.appfood"
-        minSdk = 26
-        targetSdk = 35
+        minSdk = 24
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -54,6 +56,16 @@ dependencies {
 
     // Glide (Hiển thị ảnh)
     implementation(libs.glide)
+    kapt(libs.glide.compiler)
+    
+    // Hilt (Dependency Injection)
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.compiler)
+    
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
+    implementation("androidx.activity:activity-ktx:1.9.0")
     
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -1,4 +1,4 @@
-package com.example.appfood.model
+package com.example.appfood.domain.model
 
 import java.io.Serializable
 

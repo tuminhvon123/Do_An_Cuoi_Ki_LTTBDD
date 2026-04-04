@@ -1,12 +1,15 @@
-package com.example.appfood
+package com.example.appfood.presentation.ui.activity
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.appfood.databinding.ActivityDetailBinding
-import com.example.appfood.model.Food
-import java.text.DecimalFormat
+import com.example.appfood.domain.model.Food
+import com.example.appfood.util.Extensions.formatCurrency
+import com.example.appfood.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
@@ -36,8 +39,7 @@ class DetailActivity : AppCompatActivity() {
         binding.tvDetailTitle.text = food.title
         binding.tvDetailDesc.text = food.description
         
-        val decimalFormat = DecimalFormat("#,###")
-        binding.tvDetailPrice.text = "${decimalFormat.format(food.price)} VNĐ"
+        binding.tvDetailPrice.text = food.price.formatCurrency()
         
         binding.tvTopping.text = if (food.topping.isEmpty()) "Không có topping" else food.topping
 
