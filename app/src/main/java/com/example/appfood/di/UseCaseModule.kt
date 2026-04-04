@@ -1,5 +1,6 @@
 package com.example.appfood.di
 
+import com.example.appfood.domain.usecase.*
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
@@ -7,6 +8,6 @@ import dagger.hilt.components.SingletonComponent
 @Module
 @InstallIn(SingletonComponent::class)
 object UseCaseModule {
-    // GetFoodUseCase and GetCategoryUseCase use @Inject constructor, 
+    // All use cases use @Inject constructor, 
     // so they don't need to be provided manually here.
 }

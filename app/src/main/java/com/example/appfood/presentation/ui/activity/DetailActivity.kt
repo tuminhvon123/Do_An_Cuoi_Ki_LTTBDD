@@ -1,10 +1,13 @@
 package com.example.appfood.presentation.ui.activity
 
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.example.appfood.databinding.ActivityDetailBinding
 import com.example.appfood.domain.model.Food
+import com.example.appfood.presentation.viewmodel.CartViewModel
 import com.example.appfood.util.Extensions.formatCurrency
 import com.example.appfood.R
 import dagger.hilt.android.AndroidEntryPoint
@@ -13,6 +16,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
+    private val cartViewModel: CartViewModel by viewModels()
+    private var currentFood: Food? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,6 +26,7 @@ class DetailActivity : AppCompatActivity() {
 
         // Nhận dữ liệu Food từ Intent
         val food = intent.getSerializableExtra("food") as? Food
+        currentFood = food
 
         food?.let {
             displayFoodDetail(it)
@@ -31,7 +37,16 @@ class DetailActivity : AppCompatActivity() {
         }
 
         binding.btnAddToCart.setOnClickListener {
-            // Logic thêm vào giỏ hàng (sẽ làm sau)
+            addToCart()
+        }
+    }
+
+    private fun addToCart() {
+        currentFood?.let { food ->
+            if (!food.isSoldOut) {
+                cartViewModel.addToCart(food, quantity = 1, topping = food.topping)
+                Toast.makeText(this, "Đã thêm ${food.title} vào giỏ hàng", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

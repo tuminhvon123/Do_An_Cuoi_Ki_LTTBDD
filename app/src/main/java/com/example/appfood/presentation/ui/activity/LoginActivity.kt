@@ -52,7 +52,10 @@ class LoginActivity : AppCompatActivity() {
                     if (task.isSuccessful) {
                         // Nếu đúng mật khẩu
                         Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
-                        // (Phần chuyển sang màn hình chính sẽ viết sau)
+                        // Chuyển sang MainActivity
+                        val intent = android.content.Intent(this, MainActivity::class.java)
+                        startActivity(intent)
+                        finish() // Đóng LoginActivity
                     } else {
                         // Nếu sai mật khẩu hoặc chưa đăng ký
                         Toast.makeText(this, "Sai Email hoặc Mật khẩu!", Toast.LENGTH_SHORT).show()

@@ -20,7 +20,9 @@ import com.example.appfood.databinding.ActivityMainBinding
 import com.example.appfood.domain.model.Category
 import com.example.appfood.domain.model.Food
 import com.example.appfood.presentation.viewmodel.MainViewModel
+import com.example.appfood.presentation.viewmodel.CartViewModel
 import com.example.appfood.util.Constants
+import com.example.appfood.util.PriceFormatter
 import com.example.appfood.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -47,6 +49,9 @@ class MainActivity : AppCompatActivity() {
         binding.viewPagerBanner.setCurrentItem(currentItem, true)
     }
 
+    private val mainViewModel: MainViewModel by viewModels()
+    private val cartViewModel: CartViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         try {
@@ -57,9 +62,33 @@ class MainActivity : AppCompatActivity() {
             setupBanner()
             setupRecyclerViews()
             setupSearch()
+            setupCart()
             
         } catch (e: Exception) {
             e.printStackTrace()
+        }
+    }
+
+    private fun setupCart() {
+        binding.fabCart.setOnClickListener {
+            startActivity(Intent(this, CartActivity::class.java))
+        }
+
+        lifecycleScope.launch {
+            cartViewModel.cartSummary.collect { summary ->
+                updateCartBadge(summary.first)
+            }
+        }
+    }
+
+    private fun updateCartBadge(itemCount: Int) {
+        binding.tvCartBadge.apply {
+            if (itemCount > 0) {
+                text = if (itemCount > 99) "99+" else itemCount.toString()
+                visibility = View.VISIBLE
+            } else {
+                visibility = View.GONE
+            }
         }
     }
 
