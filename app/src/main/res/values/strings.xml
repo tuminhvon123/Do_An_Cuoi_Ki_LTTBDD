@@ -1,8 +1,12 @@
 <resources>
     <string name="app_name">AppFood</string>
-    <string name="title_logIn">Đăng Nhập</string>
-    <string name="text_email">Email của bạn</string>
-    <string name="text_pass">Mật khẩu</string>
-    <string name="button_logIn">Đăng Nhập</string>
-    <string name="text_register">Bạn chưa có tài khoản? Đăng ký</string>
+    <string name="tv_logIn">Đăng Nhập</string>
+    <string name="edt_email">Email của bạn</string>
+    <string name="edt_pass">Mật khẩu</string>
+    <string name="bt_logIn">Đăng Nhập</string>
+    <string name="tv_fRegister">Bạn chưa có tài khoản? Đăng ký</string>
+    <string name="tv_register">Đăng Ký Tài Khoản</string>
+    <string name="edt_passAgain">Nhập lại Mật khẩu</string>
+    <string name="bt_register">Đăng Ký</string>
+    <string name="tv_bLogin">Đã có tài khoản? Đăng nhập</string>
 </resources>

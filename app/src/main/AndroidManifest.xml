@@ -14,7 +14,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppFood">
-
+        <activity
+            android:name=".presentation.ui.activity.RegisterActivity"
+            android:exported="false" />
         <activity
             android:name=".presentation.ui.activity.DetailActivity"
             android:exported="false" />
@@ -22,13 +24,13 @@
         <activity
             android:name=".presentation.ui.activity.CartActivity"
             android:exported="false" />
-
         <activity android:name=".presentation.ui.activity.MainActivity" />
         <activity
             android:name=".presentation.ui.activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

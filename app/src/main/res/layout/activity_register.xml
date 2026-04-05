@@ -7,47 +7,53 @@
     android:gravity="center">
 
     <TextView
-        android:id="@+id/tvWelcome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/tv_logIn"
+        android:text="@string/tv_register"
         android:textSize="32sp"
         android:textStyle="bold"
         android:textAlignment="center"
         android:layout_marginBottom="32dp"/>
 
     <EditText
-        android:id="@+id/edtEmail"
+        android:id="@+id/edtRegEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/edt_email"
+        android:text="@string/edt_email"
         android:inputType="textEmailAddress"
-        android:autofillHints="emailAddress"
         android:minHeight="48dp"
         android:layout_marginBottom="16dp"/>
 
     <EditText
-        android:id="@+id/edtPassword"
+        android:id="@+id/edtRegPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/edt_pass"
+        android:text="@string/edt_pass"
         android:inputType="textPassword"
-        android:autofillHints="password"
+        android:minHeight="48dp"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/edtRegConfirmPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/edt_passAgain"
+        android:inputType="textPassword"
         android:minHeight="48dp"
         android:layout_marginBottom="24dp"/>
 
     <Button
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnRegister"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/bt_logIn"
+        android:text="@string/bt_register"
         android:textSize="18sp"/>
 
     <TextView
-        android:id="@+id/tvGoToRegister"
+        android:id="@+id/tvGoBackLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/tv_fRegister"
+        android:text="@string/tv_bLogin"
         android:textColor="#0000FF"
         android:layout_marginTop="16dp"
         android:padding="8dp"/>

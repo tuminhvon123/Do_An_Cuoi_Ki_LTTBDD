@@ -63,10 +63,12 @@ class LoginActivity : AppCompatActivity() {
                 }
         }
 
-        // 4. Xử lý sự kiện khi bấm chữ "Chưa có tài khoản? Đăng ký ngay"
+        // 4. Lắng nghe sự kiện chuyển sang trang Đăng ký
         tvGoToRegister.setOnClickListener {
-            Toast.makeText(this, "Sẽ chuyển sang trang Đăng ký...", Toast.LENGTH_SHORT).show()
-            // (Phần chuyển trang sẽ viết khi tạo xong màn hình Đăng ký)
+            // Chuyển từ trang LoginActivity sang RegisterActivity
+            val intent = android.content.Intent(this, RegisterActivity::class.java)
+            // Khởi hành!
+            startActivity(intent)
         }
     }
 }
