@@ -9,4 +9,20 @@
     <string name="edt_passAgain">Nhập lại Mật khẩu</string>
     <string name="bt_register">Đăng Ký</string>
     <string name="tv_bLogin">Đã có tài khoản? Đăng nhập</string>
+    <string name="food_image">Ảnh món ăn</string>
+    <string name="delete">Xóa</string>
+    <string name="decrease">Giảm</string>
+    <string name="increase">Tăng</string>
+    <string name="checkout">Đặt hàng</string>
+    <string name="delivery_type">Chọn hình thức nhận hàng</string>
+    <string name="dine_in">Tại bàn</string>
+    <string name="takeaway">Mang đi</string>
+    <string name="customer_info">Thông tin khách hàng</string>
+    <string name="customer_name">Tên khách hàng</string>
+    <string name="customer_phone">Số điện thoại</string>
+    <string name="order_items">Danh sách món ăn</string>
+    <string name="special_notes">Ghi chú đặc biệt</string>
+    <string name="special_notes_hint">Thêm ghi chú cho đơn hàng (tùy chọn)</string>
+    <string name="total_price">Tổng cộng:</string>
+    <string name="confirm_order">Xác nhận đặt hàng</string>
 </resources>

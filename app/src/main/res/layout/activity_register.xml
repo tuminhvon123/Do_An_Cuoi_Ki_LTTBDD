@@ -19,7 +19,7 @@
         android:id="@+id/edtRegEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/edt_email"
+        android:hint="@string/edt_email"
         android:inputType="textEmailAddress"
         android:minHeight="48dp"
         android:layout_marginBottom="16dp"/>
@@ -28,7 +28,7 @@
         android:id="@+id/edtRegPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/edt_pass"
+        android:hint="@string/edt_pass"
         android:inputType="textPassword"
         android:minHeight="48dp"
         android:layout_marginBottom="16dp"/>

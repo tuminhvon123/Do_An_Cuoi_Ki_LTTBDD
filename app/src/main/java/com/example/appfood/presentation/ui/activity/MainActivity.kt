@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
             
+            setupToolbar()
             initData() 
             setupBanner()
             setupRecyclerViews()
@@ -67,6 +68,11 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    private fun setupToolbar() {
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
     private fun setupCart() {

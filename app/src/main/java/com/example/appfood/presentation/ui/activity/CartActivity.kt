@@ -97,8 +97,7 @@ class CartActivity : AppCompatActivity() {
         binding.btnCheckout.setOnClickListener {
             if (cartViewModel.getTotalItems() > 0) {
                 // Navigate to checkout activity
-                // For now, just show a message
-                // Toast.makeText(this, "Chức năng thanh toán sẽ được triển khai sau", Toast.LENGTH_SHORT).show()
+                startActivity(Intent(this, CheckoutActivity::class.java))
             }
         }
     }

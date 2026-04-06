@@ -24,6 +24,9 @@
         <activity
             android:name=".presentation.ui.activity.CartActivity"
             android:exported="false" />
+        <activity
+            android:name=".presentation.ui.activity.CheckoutActivity"
+            android:exported="false" />
         <activity android:name=".presentation.ui.activity.MainActivity" />
         <activity
             android:name=".presentation.ui.activity.LoginActivity"
