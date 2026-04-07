@@ -57,22 +57,34 @@ class MainActivity : AppCompatActivity() {
         try {
             binding = ActivityMainBinding.inflate(layoutInflater)
             setContentView(binding.root)
-            
-            setupToolbar()
+
             initData() 
             setupBanner()
             setupRecyclerViews()
             setupSearch()
             setupCart()
-            
+            // --- Lắng nghe sự kiện bấm vào thanh Bottom Navigation ---
+            binding.bottomNavigationView.setOnItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.nav_home -> {
+                        // Đang ở Home --> không cần làm gì cả
+                        true
+                    }
+                    R.id.nav_profile -> {
+                        // Nếu chưa có ProfileActivity thì tạm thời comment lại dòng startActivity này
+                        // val intent = Intent(this, ProfileActivity::class.java)
+                        // startActivity(intent)
+
+                        // Hiện tại cứ hiện cái Toast (thông báo nhỏ) để test trước đã
+                        android.widget.Toast.makeText(this, "Sắp có màn hình Hồ sơ!", android.widget.Toast.LENGTH_SHORT).show()
+                        true
+                    }
+                    else -> false
+                }
+            }
         } catch (e: Exception) {
             e.printStackTrace()
         }
-    }
-
-    private fun setupToolbar() {
-        setSupportActionBar(binding.toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(false)
     }
 
     private fun setupCart() {
