@@ -71,4 +71,20 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
     }
+    // Hàm này sẽ tự động chạy lên ĐẦU TIÊN ngay khi màn hình Login vừa thức dậy
+    override fun onStart() {
+        super.onStart()
+
+        // Kiểm tra xem trong điện thoại có thẻ nhớ đăng nhập của ai không?
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+
+        if (currentUser != null) {
+            // Nếu có người dùng rồi -> Chạy thẳng vào MainActivity !
+            val intent = android.content.Intent(this, MainActivity::class.java)
+            startActivity(intent)
+
+            // Đóng sập cửa trang Login lại
+            finish()
+        }
+    }
 }

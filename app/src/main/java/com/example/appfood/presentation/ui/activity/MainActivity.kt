@@ -67,16 +67,12 @@ class MainActivity : AppCompatActivity() {
             binding.bottomNavigationView.setOnItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.nav_home -> {
-                        // Đang ở Home --> không cần làm gì cả
                         true
                     }
                     R.id.nav_profile -> {
-                        // Nếu chưa có ProfileActivity thì tạm thời comment lại dòng startActivity này
-                        // val intent = Intent(this, ProfileActivity::class.java)
-                        // startActivity(intent)
-
-                        // Hiện tại cứ hiện cái Toast (thông báo nhỏ) để test trước đã
-                        android.widget.Toast.makeText(this, "Sắp có màn hình Hồ sơ!", android.widget.Toast.LENGTH_SHORT).show()
+                        // Mở màn hình Hồ sơ
+                        val intent = Intent(this, ProfileActivity::class.java)
+                        startActivity(intent)
                         true
                     }
                     else -> false

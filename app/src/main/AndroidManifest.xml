@@ -15,12 +15,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppFood">
         <activity
+            android:name=".presentation.ui.activity.ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".presentation.ui.activity.RegisterActivity"
             android:exported="false" />
         <activity
             android:name=".presentation.ui.activity.DetailActivity"
             android:exported="false" />
-
         <activity
             android:name=".presentation.ui.activity.CartActivity"
             android:exported="false" />
