@@ -1,9 +1,10 @@
 package com.example.appfood.domain.model
 
 import java.io.Serializable
+import java.util.UUID
 
 data class CartItem(
-    val id: String = "",
+    val id: String = UUID.randomUUID().toString(),
     val foodId: String = "",
     val foodTitle: String = "",
     val foodDescription: String = "",
