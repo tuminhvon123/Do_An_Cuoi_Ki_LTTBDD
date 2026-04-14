@@ -36,35 +36,36 @@ class OrderHistoryActivity : AppCompatActivity() {
     }
 
     private fun loadOrders() {
-
         firestore.collection("orders")
             .get()
             .addOnSuccessListener { result ->
 
-                val orderList = mutableListOf<Order>()
-
-                for (document in result) {
-
+                val orderList = result.documents.mapNotNull { document ->
                     try {
                         val order = document.toObject(Order::class.java)
-
-                        order.id = document.id
-
-                        orderList.add(order)
-
+                        order?.id = document.id
+                        order
                     } catch (e: Exception) {
-                        e.printStackTrace()
+                        null
                     }
-                }
+                }.toMutableList()
 
                 if (orderList.isEmpty()) {
-                    Toast.makeText(this, "Chưa có đơn hàng nào", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        this@OrderHistoryActivity,
+                        "Chưa có đơn hàng nào",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
 
                 adapter.submitList(orderList)
             }
-            .addOnFailureListener {
-                Toast.makeText(this, "Lỗi tải đơn hàng", Toast.LENGTH_SHORT).show()
+            .addOnFailureListener { e ->
+                Toast.makeText(
+                    this@OrderHistoryActivity,
+                    "Lỗi tải đơn hàng: ${e.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
     }
 }
