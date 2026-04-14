@@ -138,7 +138,25 @@
                 android:paddingEnd="12dp"
                 android:layout_marginBottom="24dp"
                 android:importantForAutofill="no" />
+            <EditText
+                android:id="@+id/edtCustomerTable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@android:drawable/editbox_background"
+                android:hint="Bàn số..."
+                android:padding="12dp"
+                android:visibility="visible" />
 
+            <EditText
+                android:id="@+id/edtCustomerAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:background="@android:drawable/editbox_background"
+                android:hint="Địa chỉ nhận hàng..."
+                android:padding="12dp"
+                android:visibility="gone" />
             <!-- Order Items Section -->
             <TextView
                 android:layout_width="match_parent"

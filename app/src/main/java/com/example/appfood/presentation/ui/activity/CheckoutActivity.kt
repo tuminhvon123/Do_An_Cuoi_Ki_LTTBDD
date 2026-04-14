@@ -54,17 +54,24 @@ class CheckoutActivity : AppCompatActivity() {
     }
 
     private fun setupDeliveryOptions() {
-        // Setup click listeners for delivery type options
         binding.layoutDineIn.setOnClickListener {
             selectedDeliveryType = "dine_in"
             checkoutViewModel.setDeliveryType("dine_in")
             updateDeliveryTypeUI()
+
+            // Hiện ô Bàn số, Ẩn ô Địa chỉ
+            binding.edtCustomerTable.visibility = View.VISIBLE
+            binding.edtCustomerAddress.visibility = View.GONE
         }
 
         binding.layoutTakeaway.setOnClickListener {
             selectedDeliveryType = "takeaway"
             checkoutViewModel.setDeliveryType("takeaway")
             updateDeliveryTypeUI()
+
+            // Ẩn ô Bàn số, Hiện ô Địa chỉ
+            binding.edtCustomerTable.visibility = View.GONE
+            binding.edtCustomerAddress.visibility = View.VISIBLE
         }
     }
 
@@ -108,15 +115,25 @@ class CheckoutActivity : AppCompatActivity() {
         customerPhone: String,
         notes: String
     ) {
-        val deliveryTypeText = if (selectedDeliveryType == "dine_in") "Tại bàn" else "Mang đi"
+        val isDineIn = selectedDeliveryType == "dine_in"
+        val deliveryTypeText = if (isDineIn) "Tại bàn" else "Mang đi"
         val totalPrice = checkoutViewModel.totalPrice.value
 
+        // Lấy thêm thông tin Bàn hoặc Địa chỉ từ giao diện
+        val extraInfo = if (isDineIn) {
+            "Bàn số: ${binding.edtCustomerTable.text.toString().trim()}"
+        } else {
+            "Địa chỉ: ${binding.edtCustomerAddress.text.toString().trim()}"
+        }
+
+        // Chèn biến extraInfo vào giữa thông báo
         val message = """
             Xác nhận đơn hàng:
             
             Khách hàng: $customerName
             SĐT: $customerPhone
             Hình thức: $deliveryTypeText
+            $extraInfo
             Tổng cộng: ${PriceFormatter.formatPrice(totalPrice)}
             
             Bạn có chắc chắn muốn đặt hàng không?
