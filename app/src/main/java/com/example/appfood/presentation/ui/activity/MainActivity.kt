@@ -69,6 +69,12 @@ class MainActivity : AppCompatActivity() {
                     R.id.nav_home -> {
                         true
                     }
+                    R.id.nav_history -> {
+                        val intent = Intent(this, OrderHistoryActivity::class.java)
+                        startActivity(intent)
+                        true
+                    }
+
                     R.id.nav_profile -> {
                         // Mở màn hình Hồ sơ
                         val intent = Intent(this, ProfileActivity::class.java)

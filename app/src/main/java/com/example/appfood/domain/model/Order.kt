@@ -3,7 +3,7 @@ package com.example.appfood.domain.model
 import java.io.Serializable
 
 data class Order(
-    val id: String = "",
+    var id: String = "",
     val userId: String = "",
     val items: List<CartItem> = emptyList(),
     val totalPrice: Double = 0.0,
