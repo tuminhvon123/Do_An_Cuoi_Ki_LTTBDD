@@ -95,7 +95,17 @@ class FirebaseOrderRepository @Inject constructor() : OrderRepository {
             Result.failure(e)
         }
     }
+
+    override suspend fun updateOrderRating(orderId: String, rating: Float, feedback: String): Result<Unit> {
+        return try {
+            val updates = mapOf(
+                "rating" to rating,
+                "feedback" to feedback
+            )
+            ordersRef.child(orderId).updateChildren(updates).await()
+            Result.success(Unit)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }
-
-
-

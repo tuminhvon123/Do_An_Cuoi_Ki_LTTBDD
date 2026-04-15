@@ -13,9 +13,10 @@ data class Order(
     val status: String = "pending", // pending, confirmed, completed, cancelled
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
-    val notes: String = ""
+    val notes: String = "",
+    var rating: Float = 0f,
+    var feedback: String = ""
 ) : Serializable {
     fun isDineIn(): Boolean = deliveryType == "dine_in"
     fun isTakeaway(): Boolean = deliveryType == "takeaway"
 }
-
