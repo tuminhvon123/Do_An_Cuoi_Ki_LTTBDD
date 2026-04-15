@@ -29,17 +29,22 @@
         <activity
             android:name=".presentation.ui.activity.CheckoutActivity"
             android:exported="false" />
-        <activity android:name=".presentation.ui.activity.MainActivity" />
+
+        <activity
+            android:name=".presentation.ui.activity.MainActivity"
+            android:exported="true" />
+
         <activity
             android:name=".presentation.ui.activity.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".presentation.ui.activity.OrderHistoryActivity"
+            android:exported="false"
             tools:ignore="Instantiatable" />
     </application>
 

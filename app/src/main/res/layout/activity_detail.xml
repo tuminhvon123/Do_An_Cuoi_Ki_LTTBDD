@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".DetailActivity">
+    tools:context=".presentation.ui.activity.DetailActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -35,11 +35,52 @@
                     android:layout_height="40dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:background="@android:drawable/btn_default"
+                    android:background="@drawable/bg_circle_white"
+                    android:elevation="4dp"
                     android:src="@android:drawable/ic_menu_revert"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@android:color/black" />
+
+                <!-- Giỏ hàng ở góc phải -->
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/layoutCart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <ImageButton
+                        android:id="@+id/btnCartDetail"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_circle_white"
+                        android:elevation="4dp"
+                        android:src="@drawable/ic_shopping_cart"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:tint="@color/primary" />
+
+                    <TextView
+                        android:id="@+id/tvCartBadgeDetail"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/bg_cart_badge"
+                        android:elevation="5dp"
+                        android:gravity="center"
+                        android:text="0"
+                        android:textColor="@color/white"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:visibility="gone"
+                        app:layout_constraintEnd_toEndOf="@id/btnCartDetail"
+                        app:layout_constraintTop_toTopOf="@id/btnCartDetail" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <LinearLayout

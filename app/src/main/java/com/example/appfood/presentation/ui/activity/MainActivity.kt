@@ -22,7 +22,6 @@ import com.example.appfood.domain.model.Food
 import com.example.appfood.presentation.viewmodel.MainViewModel
 import com.example.appfood.presentation.viewmodel.CartViewModel
 import com.example.appfood.util.Constants
-import com.example.appfood.util.PriceFormatter
 import com.example.appfood.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -41,12 +40,14 @@ class MainActivity : AppCompatActivity() {
 
     private val sliderHandler = Handler(Looper.getMainLooper())
     private val sliderRunnable = Runnable {
-        var currentItem = binding.viewPagerBanner.currentItem
-        currentItem++
-        if (currentItem >= bannerAdapter.itemCount) {
-            currentItem = 0
+        if (::binding.isInitialized) {
+            var currentItem = binding.viewPagerBanner.currentItem
+            currentItem++
+            if (currentItem >= bannerAdapter.itemCount) {
+                currentItem = 0
+            }
+            binding.viewPagerBanner.setCurrentItem(currentItem, true)
         }
-        binding.viewPagerBanner.setCurrentItem(currentItem, true)
     }
 
     private val mainViewModel: MainViewModel by viewModels()
@@ -54,38 +55,34 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        try {
-            binding = ActivityMainBinding.inflate(layoutInflater)
-            setContentView(binding.root)
+        
+        // Không dùng try-catch ở đây để nếu có lỗi (thiếu drawable/layout), 
+        // Android Studio sẽ báo lỗi đỏ chính xác nguyên nhân (Fatal Exception)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-            initData() 
-            setupBanner()
-            setupRecyclerViews()
-            setupSearch()
-            setupCart()
-            // --- Lắng nghe sự kiện bấm vào thanh Bottom Navigation ---
-            binding.bottomNavigationView.setOnItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.nav_home -> {
-                        true
-                    }
-                    R.id.nav_history -> {
-                        val intent = Intent(this, OrderHistoryActivity::class.java)
-                        startActivity(intent)
-                        true
-                    }
+        initData() 
+        setupBanner()
+        setupRecyclerViews()
+        setupSearch()
+        setupCart()
+        setupBottomNav()
+    }
 
-                    R.id.nav_profile -> {
-                        // Mở màn hình Hồ sơ
-                        val intent = Intent(this, ProfileActivity::class.java)
-                        startActivity(intent)
-                        true
-                    }
-                    else -> false
+    private fun setupBottomNav() {
+        binding.bottomNavigationView.setOnItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.nav_home -> true
+                R.id.nav_history -> {
+                    startActivity(Intent(this, OrderHistoryActivity::class.java))
+                    true
                 }
+                R.id.nav_profile -> {
+                    startActivity(Intent(this, ProfileActivity::class.java))
+                    true
+                }
+                else -> false
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
     }
 
@@ -113,7 +110,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupBanner() {
-        binding.viewPagerBanner.visibility = View.VISIBLE
         bannerAdapter = BannerAdapter(bannerImages)
         binding.viewPagerBanner.adapter = bannerAdapter
         
