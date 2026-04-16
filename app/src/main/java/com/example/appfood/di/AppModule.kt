@@ -3,6 +3,8 @@ package com.example.appfood.di
 import android.content.Context
 import com.example.appfood.data.local.SimpleCartRepository
 import com.example.appfood.domain.repository.CartRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import dagger.Binds
 import dagger.Module
@@ -30,5 +32,18 @@ abstract class AppModule {
         @Provides
         @Singleton
         fun provideGson(): Gson = Gson()
+
+        @Provides
+        @Singleton
+        fun provideFirestore(): FirebaseFirestore {
+            return FirebaseFirestore.getInstance()
+        }
+
+        @Provides
+        @Singleton
+        fun provideFirebaseAuth(): FirebaseAuth {
+            return FirebaseAuth.getInstance()
+        }
+        // ----------------------
     }
 }

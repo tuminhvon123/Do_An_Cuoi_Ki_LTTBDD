@@ -3,98 +3,98 @@ package com.example.appfood.presentation.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.RatingBar
-import android.widget.TextView
+import androidx.compose.ui.semantics.text
+import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.appfood.R
+import com.example.appfood.databinding.ItemOrderBinding
 import com.example.appfood.domain.model.Order
 import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderAdapter(
     private val onRatingClick: (Order) -> Unit
-) : RecyclerView.Adapter<OrderAdapter.OrderViewHolder>() {
+) : ListAdapter<Order, OrderAdapter.OrderViewHolder>(OrderDiffCallback()) {
 
-    private var orderList: List<Order> = listOf()
+    // ViewHolder sử dụng ViewBinding
+    inner class OrderViewHolder(private val binding: ItemOrderBinding) :
+        RecyclerView.ViewHolder(binding.root) {
 
-    // Hàm cập nhật dữ liệu
-    fun submitList(list: List<Order>) {
-        orderList = list
-        notifyDataSetChanged()
-    }
+        fun bind(order: Order) {
+            binding.apply {
+                // Hiển thị dữ liệu
+                txtOrderId.text = "Mã đơn: #${order.id.takeLast(5)}"
+                txtTotalPrice.text = "Tổng tiền: ${String.format("%,.0f", order.totalPrice)}đ"
 
-    // ViewHolder
-    class OrderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val txtOrderId: TextView = itemView.findViewById(R.id.txtOrderId)
-        val txtTotalPrice: TextView = itemView.findViewById(R.id.txtTotalPrice)
-        val txtStatus: TextView = itemView.findViewById(R.id.txtStatus)
-        val txtDate: TextView = itemView.findViewById(R.id.txtDate)
-        val btnRating: Button = itemView.findViewById(R.id.btnRating)
-        val orderRatingBar: RatingBar = itemView.findViewById(R.id.orderRatingBar)
-        val txtFeedback: TextView = itemView.findViewById(R.id.txtFeedback)
+                // Format status text
+                val statusText = when (order.status.lowercase()) {
+                    "pending" -> "Đang chờ"
+                    "confirmed" -> "Đã xác nhận"
+                    "completed", "done" -> "Đã hoàn thành"
+                    "cancelled" -> "Đã hủy"
+                    else -> order.status
+                }
+                txtStatus.text = statusText
+
+                // Định dạng màu sắc (Dùng ContextCompat để an toàn hơn)
+                val colorRes = when (order.status.uppercase()) {
+                    "PENDING" -> android.R.color.holo_orange_dark
+                    "CONFIRMED" -> android.R.color.holo_blue_dark
+                    "DONE", "COMPLETED" -> android.R.color.holo_green_dark
+                    "CANCELLED" -> android.R.color.holo_red_dark
+                    else -> android.R.color.black
+                }
+                txtStatus.setTextColor(ContextCompat.getColor(root.context, colorRes))
+
+                // Format thời gian
+                val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+                txtDate.text = sdf.format(Date(order.createdAt))
+
+                // Logic hiển thị Rating/Feedback
+                val isCompleted = order.status.lowercase() in listOf("completed", "done")
+                if (isCompleted) {
+                    if (order.rating > 0) {
+                        btnRating.visibility = View.GONE
+                        orderRatingBar.visibility = View.VISIBLE
+                        orderRatingBar.rating = order.rating
+                        txtFeedback.visibility = if (order.feedback.isNotEmpty()) View.VISIBLE else View.GONE
+                        txtFeedback.text = "Nhận xét: ${order.feedback}"
+                    } else {
+                        btnRating.visibility = View.VISIBLE
+                        orderRatingBar.visibility = View.GONE
+                        txtFeedback.visibility = View.GONE
+                        btnRating.setOnClickListener { onRatingClick(order) }
+                    }
+                } else {
+                    btnRating.visibility = View.GONE
+                    orderRatingBar.visibility = View.GONE
+                    txtFeedback.visibility = View.GONE
+                }
+            }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): OrderViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_order, parent, false)
-        return OrderViewHolder(view)
+        val binding = ItemOrderBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return OrderViewHolder(binding)
     }
 
-    override fun getItemCount(): Int = orderList.size
-
     override fun onBindViewHolder(holder: OrderViewHolder, position: Int) {
-        val order = orderList[position]
+        holder.bind(getItem(position))
+    }
 
-        // Hiển thị dữ liệu
-        holder.txtOrderId.text = "Mã đơn: #${order.id.takeLast(5)}"
-        holder.txtTotalPrice.text = "Tổng tiền: ${String.format("%,.0f", order.totalPrice)}đ"
-        
-        // Format status text
-        val statusText = when (order.status.lowercase()) {
-            "pending" -> "Đang chờ"
-            "confirmed" -> "Đã xác nhận"
-            "completed", "done" -> "Đã hoàn thành"
-            "cancelled" -> "Đã hủy"
-            else -> order.status
-        }
-        holder.txtStatus.text = statusText
-
-        // Format thời gian
-        val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
-        val date = Date(order.createdAt)
-        holder.txtDate.text = sdf.format(date)
-
-        when (order.status.uppercase()) {
-            "PENDING" -> holder.txtStatus.setTextColor(0xFFFFA000.toInt()) // vàng
-            "CONFIRMED" -> holder.txtStatus.setTextColor(0xFF2196F3.toInt()) // xanh dương
-            "DONE", "COMPLETED" -> holder.txtStatus.setTextColor(0xFF4CAF50.toInt()) // xanh lá
-            "CANCELLED" -> holder.txtStatus.setTextColor(0xFFF44336.toInt()) // đỏ
+    // DiffUtil để tối ưu việc cập nhật danh sách
+    class OrderDiffCallback : DiffUtil.ItemCallback<Order>() {
+        override fun areItemsTheSame(oldItem: Order, newItem: Order): Boolean {
+            return oldItem.id == newItem.id
         }
 
-        // Xử lý hiển thị rating
-        val isCompleted = order.status.lowercase() == "completed" || order.status.lowercase() == "done"
-        if (isCompleted) {
-            if (order.rating > 0) {
-                holder.btnRating.visibility = View.GONE
-                holder.orderRatingBar.visibility = View.VISIBLE
-                holder.orderRatingBar.rating = order.rating
-                if (order.feedback.isNotEmpty()) {
-                    holder.txtFeedback.visibility = View.VISIBLE
-                    holder.txtFeedback.text = "Nhận xét: ${order.feedback}"
-                } else {
-                    holder.txtFeedback.visibility = View.GONE
-                }
-            } else {
-                holder.btnRating.visibility = View.VISIBLE
-                holder.orderRatingBar.visibility = View.GONE
-                holder.txtFeedback.visibility = View.GONE
-                holder.btnRating.setOnClickListener { onRatingClick(order) }
-            }
-        } else {
-            holder.btnRating.visibility = View.GONE
-            holder.orderRatingBar.visibility = View.GONE
-            holder.txtFeedback.visibility = View.GONE
+        override fun areContentsTheSame(oldItem: Order, newItem: Order): Boolean {
+            return oldItem == newItem // So sánh toàn bộ nội dung
         }
     }
 }

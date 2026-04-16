@@ -43,9 +43,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".presentation.ui.activity.OrderHistoryActivity"
-            android:exported="false"
-            tools:ignore="Instantiatable" />
+        <activity
+            android:name=".presentation.ui.activity.OrderHistoryActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

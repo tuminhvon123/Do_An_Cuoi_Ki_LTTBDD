@@ -77,7 +77,9 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
     implementation("androidx.activity:activity-ktx:1.9.0")
-    
+    implementation("androidx.compose.ui:ui:1.6.7")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+
     // Room Database - REMOVE THIS
     // implementation("androidx.room:room-runtime:2.3.0")
     // implementation("androidx.room:room-ktx:2.3.0")

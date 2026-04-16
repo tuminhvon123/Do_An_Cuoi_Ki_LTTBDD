@@ -2,79 +2,73 @@ package com.example.appfood.presentation.ui.activity
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.ui.semantics.dismiss
+import androidx.compose.ui.semantics.text
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appfood.R
 import com.example.appfood.databinding.ActivityOrderHistoryBinding
 import com.example.appfood.domain.model.Order
 import com.example.appfood.presentation.adapter.OrderAdapter
-import com.google.firebase.firestore.FirebaseFirestore
+import com.example.appfood.presentation.viewmodel.HistoryViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint // Quan trọng để dùng Hilt
 class OrderHistoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOrderHistoryBinding
     private lateinit var adapter: OrderAdapter
-
-    private val firestore = FirebaseFirestore.getInstance()
+    private val viewModel: HistoryViewModel by viewModels() // Sử dụng ViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityOrderHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        binding.btnBack.setOnClickListener {
+            finish() // Đóng Activity hiện tại để quay về màn hình trước
+        }
         setupRecyclerView()
-        loadOrders()
+        observeData()
     }
 
     private fun setupRecyclerView() {
         adapter = OrderAdapter { order ->
             showRatingDialog(order)
         }
-
         binding.recyclerOrders.apply {
             layoutManager = LinearLayoutManager(this@OrderHistoryActivity)
             adapter = this@OrderHistoryActivity.adapter
         }
     }
 
-    private fun loadOrders() {
-        firestore.collection("orders")
-            .get()
-            .addOnSuccessListener { result ->
+    private fun observeData() {
+        // Hiện ProgressBar khi bắt đầu lấy dữ liệu
+        binding.progressBar.visibility = View.VISIBLE
+        binding.layoutEmpty.visibility = View.GONE
 
-                val orderList = result.documents.mapNotNull { document ->
-                    try {
-                        val order = document.toObject(Order::class.java)
-                        order?.id = document.id
-                        order
-                    } catch (e: Exception) {
-                        null
-                    }
-                }.toMutableList()
+        lifecycleScope.launch {
+            viewModel.orders.collect { orderList ->
+                // Ẩn ProgressBar khi dữ liệu đã về
+                binding.progressBar.visibility = View.GONE
 
                 if (orderList.isEmpty()) {
-                    Toast.makeText(
-                        this@OrderHistoryActivity,
-                        "Chưa có đơn hàng nào",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    binding.layoutEmpty.visibility = View.VISIBLE
+                    binding.recyclerOrders.visibility = View.GONE
+                } else {
+                    binding.layoutEmpty.visibility = View.GONE
+                    binding.recyclerOrders.visibility = View.VISIBLE
+                    adapter.submitList(orderList)
                 }
-
-                orderList.sortByDescending { it.createdAt }
-                adapter.submitList(orderList)
             }
-            .addOnFailureListener { e ->
-                Toast.makeText(
-                    this@OrderHistoryActivity,
-                    "Lỗi tải đơn hàng: ${e.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }
+        }
     }
 
     private fun showRatingDialog(order: Order) {
@@ -97,27 +91,12 @@ class OrderHistoryActivity : AppCompatActivity() {
                         return@setOnClickListener
                     }
 
-                    updateRatingToFirestore(order.id, ratingValue, feedbackText)
-                    dismiss()
+                    viewModel.updateRating(order.id, ratingValue, feedbackText) {
+                        Toast.makeText(context, "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show()
+                        dismiss()
+                    }
                 }
                 show()
-            }
-    }
-
-    private fun updateRatingToFirestore(orderId: String, rating: Float, feedback: String) {
-        val updateData = mapOf(
-            "rating" to rating,
-            "feedback" to feedback
-        )
-
-        firestore.collection("orders").document(orderId)
-            .update(updateData)
-            .addOnSuccessListener {
-                Toast.makeText(this, "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show()
-                loadOrders()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(this, "Lỗi khi đánh giá: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }
