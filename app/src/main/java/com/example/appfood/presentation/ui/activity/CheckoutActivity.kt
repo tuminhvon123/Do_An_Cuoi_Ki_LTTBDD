@@ -15,14 +15,14 @@ import com.example.appfood.presentation.viewmodel.CheckoutViewModel
 import com.example.appfood.util.PriceFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-
+import com.google.firebase.auth.FirebaseAuth
 @AndroidEntryPoint
 class CheckoutActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCheckoutBinding
     private val checkoutViewModel: CheckoutViewModel by viewModels()
     private lateinit var orderAdapter: OrderSummaryAdapter
-
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private var selectedDeliveryType = "dine_in"
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -157,11 +157,18 @@ class CheckoutActivity : AppCompatActivity() {
         customerPhone: String,
         notes: String
     ) {
-        // Use empty string for userId since the app doesn't have auth yet
-        // In a real app, get the actual user ID from authentication
-        val userId = "guest_user"
-        checkoutViewModel.createOrder(userId, customerName, customerPhone, notes)
+        val currentUser = auth.currentUser
+
+        if (currentUser != null) {
+            // Nếu đã đăng nhập, lấy UID hoàn chỉnh
+            val userId = currentUser.uid
+            checkoutViewModel.createOrder(userId, customerName, customerPhone, notes)
+        } else {
+            // Nếu vì lý do nào đó chưa đăng nhập, thông báo lỗi
+            Toast.makeText(this, "Vui lòng đăng nhập để đặt hàng!", Toast.LENGTH_SHORT).show()
+        }
     }
+
 
     private fun observeViewModel() {
         lifecycleScope.launch {

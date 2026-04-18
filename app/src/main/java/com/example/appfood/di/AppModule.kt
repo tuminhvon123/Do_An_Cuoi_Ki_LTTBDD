@@ -4,6 +4,7 @@ import android.content.Context
 import com.example.appfood.data.local.SimpleCartRepository
 import com.example.appfood.domain.repository.CartRepository
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.gson.Gson
 import dagger.Binds
@@ -24,6 +25,7 @@ abstract class AppModule {
         simpleCartRepository: SimpleCartRepository
     ): CartRepository
 
+
     companion object {
         @Provides
         @Singleton
@@ -41,9 +43,14 @@ abstract class AppModule {
 
         @Provides
         @Singleton
+        fun provideFirebaseDatabase(): FirebaseDatabase {
+            return FirebaseDatabase.getInstance()
+        }
+
+        @Provides
+        @Singleton
         fun provideFirebaseAuth(): FirebaseAuth {
             return FirebaseAuth.getInstance()
         }
-        // ----------------------
     }
 }
