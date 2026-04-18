@@ -8,9 +8,10 @@
     android:orientation="vertical">
 
     <com.google.android.material.card.MaterialCardView
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        app:cardCornerRadius="35dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="20dp"
         app:cardElevation="2dp"
         app:strokeWidth="0dp">
 
@@ -18,9 +19,8 @@
             android:id="@+id/imgCategory"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="15dp"
-            android:scaleType="centerInside"
-            android:src="@android:drawable/ic_menu_gallery" />
+            android:padding="12dp"
+            android:scaleType="centerInside" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
@@ -29,7 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Category"
-        android:textColor="#444444"
-        android:textSize="14sp"
+        android:textColor="@color/black"
+        android:textSize="12sp"
         android:textStyle="bold" />
 </LinearLayout>

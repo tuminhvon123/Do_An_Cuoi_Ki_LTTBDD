@@ -2,15 +2,21 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/ic_home_shoppe"
+        android:icon="@android:drawable/ic_menu_today"
         android:title="Home" />
 
     <item
-        android:id="@+id/nav_history"
+        android:id="@+id/nav_order"
         android:icon="@android:drawable/ic_menu_recent_history"
-        android:title="Lịch sử"/>
+        android:title="Order"/>
+
+    <item
+        android:id="@+id/nav_my_list"
+        android:icon="@android:drawable/btn_star_big_on"
+        android:title="My List" />
+
     <item
         android:id="@+id/nav_profile"
-        android:icon="@drawable/ic_profile_shoppe"
-        android:title="Hồ sơ" />
+        android:icon="@android:drawable/ic_menu_myplaces"
+        android:title="Profile" />
 </menu>

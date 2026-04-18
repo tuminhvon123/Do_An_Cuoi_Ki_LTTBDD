@@ -19,6 +19,7 @@ import com.example.appfood.presentation.ui.adapter.FoodAdapter
 import com.example.appfood.databinding.ActivityMainBinding
 import com.example.appfood.domain.model.Category
 import com.example.appfood.domain.model.Food
+import com.example.appfood.domain.model.FoodSize
 import com.example.appfood.presentation.viewmodel.MainViewModel
 import com.example.appfood.presentation.viewmodel.CartViewModel
 import com.example.appfood.util.Constants
@@ -56,8 +57,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        // Không dùng try-catch ở đây để nếu có lỗi (thiếu drawable/layout), 
-        // Android Studio sẽ báo lỗi đỏ chính xác nguyên nhân (Fatal Exception)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -73,12 +72,16 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_home -> true
-                R.id.nav_history -> {
+                R.id.nav_order -> {
                     startActivity(Intent(this, OrderHistoryActivity::class.java))
                     true
                 }
                 R.id.nav_profile -> {
                     startActivity(Intent(this, ProfileActivity::class.java))
+                    true
+                }
+                R.id.nav_my_list -> {
+                    // Chức năng My List sẽ làm sau
                     true
                 }
                 else -> false
@@ -88,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupCart() {
         binding.fabCart.setOnClickListener {
-            startActivity(Intent(this, CartActivity::class.java))
+             startActivity(Intent(this, CartActivity::class.java))
         }
 
         lifecycleScope.launch {
@@ -113,7 +116,6 @@ class MainActivity : AppCompatActivity() {
         bannerAdapter = BannerAdapter(bannerImages)
         binding.viewPagerBanner.adapter = bannerAdapter
         
-        // Tự động chạy slider sau mỗi 3 giây
         binding.viewPagerBanner.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
@@ -125,23 +127,54 @@ class MainActivity : AppCompatActivity() {
 
     private fun initData() {
         categoryList.clear()
-        categoryList.add(Category(0, "Tất cả", "https://cdn-icons-png.flaticon.com/512/1046/1046771.png"))
-        categoryList.add(Category(1, "Pizza", "https://cdn-icons-png.flaticon.com/512/3595/3595455.png"))
-        categoryList.add(Category(2, "Burger", "https://cdn-icons-png.flaticon.com/512/706/706918.png"))
-        categoryList.add(Category(3, "Drink", "https://cdn-icons-png.flaticon.com/512/2405/2405479.png"))
-        categoryList.add(Category(4, "Chicken", "https://cdn-icons-png.flaticon.com/512/3143/3143640.png"))
+        categoryList.add(Category(0, "Tất cả", "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200"))
+        categoryList.add(Category(4, "Gà Rán", "https://images.unsplash.com/photo-1562967914-608f82629710?w=200"))
+        categoryList.add(Category(2, "Burger", "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200"))
+        categoryList.add(Category(5, "Mì Ý", "https://images.unsplash.com/photo-1516100882582-96c3a05fe590?w=200"))
+        categoryList.add(Category(7, "Cơm", "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=200"))
+        categoryList.add(Category(6, "Ăn kèm", "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=200"))
+        categoryList.add(Category(3, "Đồ uống", "https://images.unsplash.com/photo-1544145945-f904253d0c71?w=200"))
+        categoryList.add(Category(8, "Tráng miệng", "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=200"))
 
         foodList.clear()
-        foodList.add(Food("1", "Pizza Hải Sản", "Pizza hải sản cao cấp với tôm và mực tươi.", 150000.0, "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&auto=format", 1, false, "Thêm phô mai, Đế dày"))
-        foodList.add(Food("2", "Burger Bò", "Burger bò Mỹ với phô mai tan chảy.", 55000.0, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format", 2, false, "Thêm thịt, Ít rau"))
-        foodList.add(Food("3", "Coca Cola", "Nước giải khát Coca Cola mát lạnh.", 15000.0, "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&auto=format", 3, true, ""))
-        foodList.add(Food("4", "Gà Rán", "Gà rán giòn tan chuẩn vị KFC.", 35000.0, "https://images.unsplash.com/photo-1562967914-608f82629710?w=500&auto=format", 4, false, "Thêm tương ớt"))
-        foodList.add(Food("5", "Pizza Phô Mai", "Nhiều phô mai kéo sợi cực hấp dẫn.", 120000.0, "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&auto=format", 1, false, ""))
+        
+        // --- Gà Rán ---
+        foodList.add(Food("101", "Chickenjoy 1 miếng", "1 miếng gà giòn tan đặc trưng.", 35000.0, "https://images.unsplash.com/photo-1562967914-608f82629710?w=500", 4, false, ""))
+        foodList.add(Food("102", "Chickenjoy 2 miếng", "2 miếng gà giòn tan.", 65000.0, "https://images.unsplash.com/photo-1562967914-608f82629710?w=500", 4, false, ""))
+        foodList.add(Food("104", "Chickenjoy bucket", "Xô gà giòn tiết kiệm.", 99000.0, "https://images.unsplash.com/photo-1562967914-608f82629710?w=500", 4, false, "",
+            listOf(FoodSize("3 miếng", 0.0), FoodSize("5 miếng", 56000.0), FoodSize("10 miếng", 200000.0))))
+
+        // --- Burger ---
+        foodList.add(Food("201", "Yum Burger", "Burger bò truyền thống.", 32000.0, "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500", 2, false, ""))
+        foodList.add(Food("202", "Cheese Burger", "Burger bò kèm phô mai lát.", 38000.0, "https://images.unsplash.com/photo-1550547660-d9450f859349?w=500", 2, false, ""))
+
+        // --- Mì Ý ---
+        foodList.add(Food("501", "Jolly Spaghetti", "Mì Ý sốt bò bằm đặc trưng.", 40000.0, "https://images.unsplash.com/photo-1516100882582-96c3a05fe590?w=500", 5, false, "",
+            listOf(FoodSize("Vừa", 0.0), FoodSize("Lớn", 15000.0))))
+
+        // --- Cơm ---
+        foodList.add(Food("701", "Cơm gà rán", "Cơm trắng kèm gà rán giòn.", 45000.0, "https://images.unsplash.com/photo-1562967914-608f82629710?w=500", 7, false, ""))
+        foodList.add(Food("702", "Cơm burger steak", "Burger bò rưới sốt nấm và cơm.", 42000.0, "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=500", 7, false, ""))
+
+        // --- Ăn kèm ---
+        foodList.add(Food("601", "Khoai tây chiên", "Khoai tây chiên vàng giòn.", 25000.0, "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=500", 6, false, "",
+            listOf(FoodSize("Vừa", 0.0), FoodSize("Lớn", 10000.0))))
+
+        // --- Đồ uống ---
+        foodList.add(Food("301", "Nước ngọt", "Nước ngọt có gas mát lạnh.", 15000.0, "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500", 3, false, "",
+            listOf(FoodSize("Vừa", 0.0), FoodSize("Lớn", 5000.0))))
+        
+        foodList.add(Food("303", "Milo", "Sữa lúa mạch Milo thơm ngon.", 20000.0, "https://images.unsplash.com/photo-1541944743827-e04aa6427c33?w=500", 3, false, ""))
+
+        // --- Tráng miệng ---
+        foodList.add(Food("801", "Kem ly chocolate", "Kem socola mịn màng.", 15000.0, "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=500", 8, false, ""))
+        foodList.add(Food("804", "Peach Mango Pie", "Bánh pie đào xoài giòn rụm.", 28000.0, "https://images.unsplash.com/photo-1568571780765-9276ac8b75a2?w=500", 8, false, ""))
+        foodList.add(Food("805", "Halo-halo", "Chè thập cẩm đặc trưng.", 45000.0, "https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=500", 8, false, ""))
     }
 
     private fun setupRecyclerViews() {
         categoryAdapter = CategoryAdapter(categoryList) { category ->
-            val filteredList = if (category.name == "Tất cả") foodList else foodList.filter { it.categoryId == category.id }
+            val filteredList = if (category.id == 0) foodList else foodList.filter { it.categoryId == category.id }
             foodAdapter.updateList(filteredList)
         }
         binding.recyclerViewCategory.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)

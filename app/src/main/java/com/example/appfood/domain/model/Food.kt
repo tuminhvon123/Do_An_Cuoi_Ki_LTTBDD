@@ -10,5 +10,11 @@ data class Food(
     var imageUrl: String = "",
     var categoryId: Int = 0,
     var isSoldOut: Boolean = false,
-    var topping: String = ""
+    var topping: String = "",
+    var sizes: List<FoodSize> = emptyList()
+) : Serializable
+
+data class FoodSize(
+    val name: String,
+    val pricePlus: Double
 ) : Serializable
