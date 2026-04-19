@@ -9,11 +9,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import com.example.appfood.R
+import android.content.Intent
 
 @AndroidEntryPoint
 class LoginActivity : AppCompatActivity() {
 
-    // 1. Khai báo các "Biến" đại diện cho giao diện
     private lateinit var edtEmail: EditText
     private lateinit var edtPassword: EditText
     private lateinit var btnLogin: Button
@@ -22,69 +22,56 @@ class LoginActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Giống như "địa chỉ" để kết nối giao diện từ activity_login
         setContentView(R.layout.activity_login)
 
-        // Khởi tạo công cụ Firebase
         auth = FirebaseAuth.getInstance()
 
-        // 2. Kết nối code với file giao diện
+        // 1. Ánh xạ ID
         edtEmail = findViewById(R.id.edtEmail)
         edtPassword = findViewById(R.id.edtPassword)
         btnLogin = findViewById(R.id.btnLogin)
         tvGoToRegister = findViewById(R.id.tvGoToRegister)
 
-        // 3. Xử lý sự kiện khi bấm nút Đăng nhập
+        // 2. Xử lý Đăng nhập
         btnLogin.setOnClickListener {
-            // Lấy chữ mà người dùng gõ vào ô nhập liệu
             val email = edtEmail.text.toString().trim()
             val password = edtPassword.text.toString().trim()
 
-            // Kiểm tra xem người dùng có bỏ trống ô nào không
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Vui lòng nhập đầy đủ Email và Mật khẩu!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener // Dừng lại, không chạy tiếp xuống dưới
+                return@setOnClickListener
             }
 
-            // Gọi Firebase để kiểm tra tài khoản
             auth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        // Nếu đúng mật khẩu
                         Toast.makeText(this, "Đăng nhập thành công!", Toast.LENGTH_SHORT).show()
-                        // Chuyển sang MainActivity
-                        val intent = android.content.Intent(this, MainActivity::class.java)
+
+                        //Mở thẳng MainActivity và xóa sạch lịch sử trang cũ
+                        val intent = Intent(this, MainActivity::class.java)
+                        intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)
-                        finish() // Đóng LoginActivity
                     } else {
-                        // Nếu sai mật khẩu hoặc chưa đăng ký
                         Toast.makeText(this, "Sai Email hoặc Mật khẩu!", Toast.LENGTH_SHORT).show()
                     }
                 }
         }
 
-        // 4. Lắng nghe sự kiện chuyển sang trang Đăng ký
+        // 3. Chuyển sang trang Đăng ký
         tvGoToRegister.setOnClickListener {
-            // Chuyển từ trang LoginActivity sang RegisterActivity
             val intent = android.content.Intent(this, RegisterActivity::class.java)
-            // Khởi hành!
             startActivity(intent)
         }
     }
-    // Hàm này sẽ tự động chạy lên ĐẦU TIÊN ngay khi màn hình Login vừa thức dậy
+
     override fun onStart() {
         super.onStart()
-
-        // Kiểm tra xem trong điện thoại có thẻ nhớ đăng nhập của ai không?
-        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
-
+        val currentUser = auth.currentUser
         if (currentUser != null) {
-            // Nếu có người dùng rồi -> Chạy thẳng vào MainActivity !
-            val intent = android.content.Intent(this, MainActivity::class.java)
+            // Đã đăng nhập rồi thì chuyển thẳng về trang chủ
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = android.content.Intent.FLAG_ACTIVITY_NEW_TASK or android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
-
-            // Đóng sập cửa trang Login lại
-            finish()
         }
     }
 }

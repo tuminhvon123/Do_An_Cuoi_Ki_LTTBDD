@@ -16,6 +16,7 @@ import com.example.appfood.util.PriceFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 @AndroidEntryPoint
 class CheckoutActivity : AppCompatActivity() {
 
@@ -35,6 +36,7 @@ class CheckoutActivity : AppCompatActivity() {
         setupDeliveryOptions()
         setupClickListeners()
         observeViewModel()
+        autoFillUserData()
     }
 
     private fun setupToolbar() {
@@ -159,14 +161,11 @@ class CheckoutActivity : AppCompatActivity() {
     ) {
         val currentUser = auth.currentUser
 
-        if (currentUser != null) {
-            // Nếu đã đăng nhập, lấy UID hoàn chỉnh
-            val userId = currentUser.uid
-            checkoutViewModel.createOrder(userId, customerName, customerPhone, notes)
-        } else {
-            // Nếu vì lý do nào đó chưa đăng nhập, thông báo lỗi
-            Toast.makeText(this, "Vui lòng đăng nhập để đặt hàng!", Toast.LENGTH_SHORT).show()
-        }
+        // Nếu có đăng nhập thì lấy ID thật, nếu không thì gán tạm là "guest_user"
+        val userId = currentUser?.uid ?: "guest_user"
+
+        // Tiến hành tạo đơn hàng bình thường
+        checkoutViewModel.createOrder(userId, customerName, customerPhone, notes)
     }
 
 
@@ -219,6 +218,28 @@ class CheckoutActivity : AppCompatActivity() {
             }
             .setCancelable(false)
             .show()
+    }
+    private fun autoFillUserData() {
+        val currentUser = auth.currentUser
+
+        // Chỉ đi kéo dữ liệu nếu khách ĐÃ đăng nhập
+        if (currentUser != null) {
+            val db = FirebaseFirestore.getInstance()
+
+            db.collection("Users").document(currentUser.uid).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val fullName = document.getString("fullName") ?: ""
+                        val phone = document.getString("phone") ?: ""
+                        val address = document.getString("address") ?: ""
+
+                        // Tự động điền chữ vào các ô
+                        binding.edtCustomerName.setText(fullName)
+                        binding.edtCustomerPhone.setText(phone)
+                        binding.edtCustomerAddress.setText(address)
+                    }
+                }
+        }
     }
 }
 
