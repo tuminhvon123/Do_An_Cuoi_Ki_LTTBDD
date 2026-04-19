@@ -16,6 +16,9 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var edtRegEmail: EditText
     private lateinit var edtRegPassword: EditText
     private lateinit var edtRegConfirmPassword: EditText
+    private lateinit var edtRegFullName: EditText
+    private lateinit var edtRegPhone: EditText
+    private lateinit var edtRegAddress: EditText
     private lateinit var btnRegister: Button
     private lateinit var tvGoBackLogin: TextView
     private lateinit var auth: FirebaseAuth
@@ -30,6 +33,9 @@ class RegisterActivity : AppCompatActivity() {
         edtRegEmail = findViewById(R.id.edtRegEmail)
         edtRegPassword = findViewById(R.id.edtRegPassword)
         edtRegConfirmPassword = findViewById(R.id.edtRegConfirmPassword)
+        edtRegFullName = findViewById(R.id.edtFullNameRegister)
+        edtRegPhone = findViewById(R.id.edtPhoneRegister)
+        edtRegAddress = findViewById(R.id.edtAddressRegister)
         btnRegister = findViewById(R.id.btnRegister)
         tvGoBackLogin = findViewById(R.id.tvGoBackLogin)
 
@@ -38,27 +44,55 @@ class RegisterActivity : AppCompatActivity() {
             val email = edtRegEmail.text.toString().trim()
             val password = edtRegPassword.text.toString().trim()
             val confirmPassword = edtRegConfirmPassword.text.toString().trim()
+            val fullName = edtRegFullName.text.toString().trim()
+            val phone = edtRegPhone.text.toString().trim()
+            val address = edtRegAddress.text.toString().trim()
 
             // 1. Kiểm tra không được để trống
-            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
-                Toast.makeText(this, "Vui lòng nhập đầy đủ thông tin!", Toast.LENGTH_SHORT).show()
+            if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty() ||
+                fullName.isEmpty() || phone.isEmpty() || address.isEmpty()) {
+                Toast.makeText(this, "Vui lòng điền đầy đủ tất cả các ô!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 2. Kiểm tra mật khẩu nhập lại có khớp không
+            // 2. Kiểm tra mật khẩu
             if (password != confirmPassword) {
                 Toast.makeText(this, "Mật khẩu nhập lại không khớp!", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // 3. Đẩy thông tin lên Firebase để tạo tài khoản
+            // 3. Tiến hành tạo tài khoản trên Firebase Auth
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this) { task ->
                     if (task.isSuccessful) {
-                        Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show()
-                        // Tự động đóng màn hình Đăng ký, quay về màn hình Đăng nhập
-                        finish()
+                        // 4. Nếu tạo tài khoản thành công, lấy ID và tiến hành cất dữ liệu vào Firestore
+                        val userId = auth.currentUser?.uid
+
+                        if (userId != null) {
+                            // Tạo gói hàng (Map) chứa dữ liệu
+                            val userProfileMap = hashMapOf(
+                                "fullName" to fullName,
+                                "phone" to phone,
+                                "address" to address,
+                                "email" to email
+                            )
+
+                            // Mở Két sắt Firestore và nạp dữ liệu
+                            val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                            db.collection("Users").document(userId)
+                                .set(userProfileMap)
+                                .addOnSuccessListener {
+                                    // Thành công CẢ HAI BƯỚC (Auth + Firestore)
+                                    Toast.makeText(this, "Đăng ký thành công!", Toast.LENGTH_SHORT).show()
+                                    finish() // Về trang Login
+                                }
+                                .addOnFailureListener { e ->
+                                    // Lỗi khi lưu Firestore
+                                    Toast.makeText(this, "Lỗi lưu thông tin: ${e.message}", Toast.LENGTH_SHORT).show()
+                                }
+                        }
                     } else {
+                        // Lỗi khi tạo tài khoản (vd: email trùng, pass ngắn)
                         Toast.makeText(this, "Đăng ký thất bại: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
                     }
                 }

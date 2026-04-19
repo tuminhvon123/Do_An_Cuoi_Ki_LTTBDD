@@ -16,6 +16,33 @@
         android:layout_marginBottom="32dp"/>
 
     <EditText
+        android:id="@+id/edtFullNameRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/customer_name"
+        android:layout_marginBottom="12dp"
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp" />
+
+    <EditText
+        android:id="@+id/edtPhoneRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/customer_phone"
+        android:inputType="phone"
+        android:layout_marginBottom="12dp"
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp" />
+
+    <EditText
+        android:id="@+id/edtAddressRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Địa chỉ giao hàng"
+        android:layout_marginBottom="12dp"
+        android:background="@android:drawable/editbox_background"
+        android:padding="12dp" />
+    <EditText
         android:id="@+id/edtRegEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

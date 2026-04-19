@@ -18,7 +18,7 @@
     <string name="dine_in">Tại bàn</string>
     <string name="takeaway">Giao hàng</string>
     <string name="customer_info">Thông tin khách hàng</string>
-    <string name="customer_name">Tên khách hàng</string>
+    <string name="customer_name">Họ và tên</string>
     <string name="customer_phone">Số điện thoại</string>
     <string name="order_items">Danh sách món ăn</string>
     <string name="special_notes">Ghi chú đặc biệt</string>
