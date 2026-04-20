@@ -37,6 +37,16 @@ class OrderHistoryActivity : AppCompatActivity() {
         }
         setupRecyclerView()
         observeData()
+
+        // Log để debug
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        android.util.Log.d("HISTORY", "Current user: ${currentUser?.uid ?: "NULL - Chưa đăng nhập"}")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        android.util.Log.d("HISTORY", "onResume - Refresh đơn hàng")
+        viewModel.refreshOrders() // Refresh khi quay lại màn hình
     }
 
     private fun setupRecyclerView() {

@@ -161,11 +161,21 @@ class CheckoutActivity : AppCompatActivity() {
     ) {
         val currentUser = auth.currentUser
 
-        // Nếu có đăng nhập thì lấy ID thật, nếu không thì gán tạm là "guest_user"
-        val userId = currentUser?.uid ?: "guest_user"
+        // Nếu có đăng nhập thì lấy ID thật, nếu không thì tạo guest ID và lưu lại
+        val userId = currentUser?.uid ?: generateAndSaveGuestId()
 
         // Tiến hành tạo đơn hàng bình thường
         checkoutViewModel.createOrder(userId, customerName, customerPhone, notes)
+    }
+
+    private fun generateAndSaveGuestId(): String {
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        var guestId = prefs.getString("guest_user_id", null)
+        if (guestId == null) {
+            guestId = "guest_${System.currentTimeMillis()}"
+            prefs.edit().putString("guest_user_id", guestId).apply()
+        }
+        return guestId
     }
 
 
