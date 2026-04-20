@@ -4,6 +4,8 @@ import com.example.appfood.domain.model.Order
 import com.example.appfood.domain.repository.OrderRepository
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
@@ -39,17 +41,23 @@ class OrderRepositoryImpl @Inject constructor(
     }
 
     override suspend fun getUserOrders(userId: String): Flow<List<Order>> = callbackFlow {
-        val subscription = firestore.collection("orders")
+        val db = FirebaseFirestore.getInstance()
+        val listener = db.collection("orders")
             .whereEqualTo("userId", userId)
             .addSnapshotListener { snapshot, error ->
                 if (error != null) {
                     close(error)
                     return@addSnapshotListener
                 }
-                val orders = snapshot?.toObjects(Order::class.java) ?: emptyList()
+                val orders = snapshot?.documents?.mapNotNull { doc ->
+                    val order = doc.toObject(Order::class.java)
+                    order?.apply {
+                        id = doc.id
+                    }
+                } ?: emptyList()
                 trySend(orders)
             }
-        awaitClose { subscription.remove() }
+        awaitClose { listener.remove() }
     }
 
     override suspend fun updateOrderStatus(orderId: String, status: String): Result<Unit> {

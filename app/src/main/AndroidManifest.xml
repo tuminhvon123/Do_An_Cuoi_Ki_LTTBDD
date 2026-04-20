@@ -52,6 +52,7 @@
         <activity
             android:name=".presentation.ui.activity.OrderHistoryActivity"
             android:exported="false" />
+        <activity android:name=".presentation.ui.activity.OrderDetailActivity"/>
     </application>
 
 </manifest>

@@ -14,7 +14,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderAdapter(
-    private val onRatingClick: (Order) -> Unit
+    private val onRatingClick: (Order) -> Unit,
+    private val onItemClick: (Order) -> Unit
 ) : ListAdapter<Order, OrderAdapter.OrderViewHolder>(OrderDiffCallback()) {
 
     inner class OrderViewHolder(private val binding: ItemOrderBinding) :
@@ -22,9 +23,23 @@ class OrderAdapter(
 
         fun bind(order: Order) {
             binding.apply {
+
+                // Mã đơn
                 txtOrderId.text = "Mã đơn: #${order.id.takeLast(5)}"
+
+                txtItems.text = if (order.items.isNotEmpty()) {
+                    order.items
+                        .take(3) // lấy tối đa 3 món cho tối ưu UI
+                        .joinToString("\n") { "${it.foodTitle} (x${it.quantity})" } +
+                            if (order.items.size > 3) "\n..." else ""
+                } else {
+                    "Không có món"
+                }
+
+                // Tổng tiền
                 txtTotalPrice.text = "Tổng tiền: ${String.format("%,.0f", order.totalPrice)}đ"
 
+                // Trạng thái
                 val statusText = when (order.status.lowercase()) {
                     "pending" -> "Đang chờ"
                     "confirmed" -> "Đã xác nhận"
@@ -43,16 +58,20 @@ class OrderAdapter(
                 }
                 txtStatus.setTextColor(ContextCompat.getColor(root.context, colorRes))
 
+                // Ngày
                 val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
                 txtDate.text = sdf.format(Date(order.createdAt))
 
+                // Rating
                 val isCompleted = order.status.lowercase() in listOf("completed", "done")
                 if (isCompleted) {
                     if (order.rating > 0) {
                         btnRating.visibility = View.GONE
                         orderRatingBar.visibility = View.VISIBLE
                         orderRatingBar.rating = order.rating
-                        txtFeedback.visibility = if (order.feedback.isNotEmpty()) View.VISIBLE else View.GONE
+
+                        txtFeedback.visibility =
+                            if (order.feedback.isNotEmpty()) View.VISIBLE else View.GONE
                         txtFeedback.text = "Nhận xét: ${order.feedback}"
                     } else {
                         btnRating.visibility = View.VISIBLE
@@ -65,6 +84,9 @@ class OrderAdapter(
                     orderRatingBar.visibility = View.GONE
                     txtFeedback.visibility = View.GONE
                 }
+            }
+            binding.root.setOnClickListener {
+                onItemClick(order)
             }
         }
     }

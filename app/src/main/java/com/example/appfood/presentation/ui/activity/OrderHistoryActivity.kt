@@ -3,6 +3,7 @@ package com.example.appfood.presentation.ui.activity
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.content.Intent
 import android.widget.EditText
 import android.widget.RatingBar
 import android.widget.Toast
@@ -26,12 +27,21 @@ class OrderHistoryActivity : AppCompatActivity() {
     private lateinit var adapter: OrderAdapter
     private val viewModel: HistoryViewModel by viewModels()
 
+    override fun onBackPressed() {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+        startActivity(intent)
+        finish()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityOrderHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         binding.btnBack.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
             finish()
         }
         
@@ -50,15 +60,24 @@ class OrderHistoryActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        adapter = OrderAdapter { order ->
-            showRatingDialog(order)
-        }
+        adapter = OrderAdapter(
+            onRatingClick = { order ->
+                showRatingDialog(order)
+            },
+            onItemClick = { order ->
+                openOrderDetail(order)
+            }
+        )
         binding.recyclerOrders.apply {
             layoutManager = LinearLayoutManager(this@OrderHistoryActivity)
             adapter = this@OrderHistoryActivity.adapter
         }
     }
-
+    private fun openOrderDetail(order: Order) {
+        val intent = Intent(this, OrderDetailActivity::class.java)
+        intent.putExtra("order_data", order)
+        startActivity(intent)
+    }
     private fun observeData() {
         binding.progressBar.visibility = View.VISIBLE
         binding.layoutEmpty.visibility = View.GONE

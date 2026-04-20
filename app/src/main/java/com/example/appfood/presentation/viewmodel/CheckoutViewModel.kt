@@ -66,7 +66,9 @@ class CheckoutViewModel @Inject constructor(
         userId: String,
         customerName: String,
         customerPhone: String,
-        notes: String
+        notes: String,
+        customerTable: String,
+        customerAddress: String
     ) {
         viewModelScope.launch {
             _isLoading.value = true
@@ -97,6 +99,8 @@ class CheckoutViewModel @Inject constructor(
                     customerName = customerName,
                     customerPhone = customerPhone,
                     notes = notes,
+                    tableNumber = if (deliveryType.value == "dine_in") customerTable else "",
+                    address = if (deliveryType.value == "takeaway") customerAddress else "",
                     status = "pending"
                 )
 

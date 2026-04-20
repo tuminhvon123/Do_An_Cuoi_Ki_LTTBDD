@@ -14,6 +14,8 @@ data class Order(
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis(),
     val notes: String = "",
+    val address: String = "",
+    val tableNumber: String = "",
     var rating: Float = 0f,
     var feedback: String = ""
 ) : Serializable {

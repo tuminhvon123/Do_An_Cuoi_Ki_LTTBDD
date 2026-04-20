@@ -3,6 +3,7 @@ package com.example.appfood.presentation.ui.activity
 import android.app.AlertDialog
 import android.os.Bundle
 import android.view.View
+import android.content.Intent
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -165,7 +166,8 @@ class CheckoutActivity : AppCompatActivity() {
         val userId = currentUser?.uid ?: generateAndSaveGuestId()
 
         // Tiến hành tạo đơn hàng bình thường
-        checkoutViewModel.createOrder(userId, customerName, customerPhone, notes)
+        checkoutViewModel.createOrder(userId, customerName, customerPhone, notes, binding.edtCustomerTable.text.toString(),
+            binding.edtCustomerAddress.text.toString())
     }
 
     private fun generateAndSaveGuestId(): String {
@@ -223,7 +225,11 @@ class CheckoutActivity : AppCompatActivity() {
             .setMessage("Đơn hàng của bạn đã được tạo thành công!")
             .setPositiveButton("OK") { dialog, _ ->
                 dialog.dismiss()
-                // Clear cart and return to main
+
+                val intent = Intent(this, OrderHistoryActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                startActivity(intent)
+
                 finish()
             }
             .setCancelable(false)
