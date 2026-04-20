@@ -3,7 +3,6 @@ package com.example.appfood.presentation.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.ui.semantics.text
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -18,17 +17,14 @@ class OrderAdapter(
     private val onRatingClick: (Order) -> Unit
 ) : ListAdapter<Order, OrderAdapter.OrderViewHolder>(OrderDiffCallback()) {
 
-    // ViewHolder sử dụng ViewBinding
     inner class OrderViewHolder(private val binding: ItemOrderBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(order: Order) {
             binding.apply {
-                // Hiển thị dữ liệu
                 txtOrderId.text = "Mã đơn: #${order.id.takeLast(5)}"
                 txtTotalPrice.text = "Tổng tiền: ${String.format("%,.0f", order.totalPrice)}đ"
 
-                // Format status text
                 val statusText = when (order.status.lowercase()) {
                     "pending" -> "Đang chờ"
                     "confirmed" -> "Đã xác nhận"
@@ -38,7 +34,6 @@ class OrderAdapter(
                 }
                 txtStatus.text = statusText
 
-                // Định dạng màu sắc (Dùng ContextCompat để an toàn hơn)
                 val colorRes = when (order.status.uppercase()) {
                     "PENDING" -> android.R.color.holo_orange_dark
                     "CONFIRMED" -> android.R.color.holo_blue_dark
@@ -48,11 +43,9 @@ class OrderAdapter(
                 }
                 txtStatus.setTextColor(ContextCompat.getColor(root.context, colorRes))
 
-                // Format thời gian
                 val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
                 txtDate.text = sdf.format(Date(order.createdAt))
 
-                // Logic hiển thị Rating/Feedback
                 val isCompleted = order.status.lowercase() in listOf("completed", "done")
                 if (isCompleted) {
                     if (order.rating > 0) {
@@ -87,14 +80,8 @@ class OrderAdapter(
         holder.bind(getItem(position))
     }
 
-    // DiffUtil để tối ưu việc cập nhật danh sách
     class OrderDiffCallback : DiffUtil.ItemCallback<Order>() {
-        override fun areItemsTheSame(oldItem: Order, newItem: Order): Boolean {
-            return oldItem.id == newItem.id
-        }
-
-        override fun areContentsTheSame(oldItem: Order, newItem: Order): Boolean {
-            return oldItem == newItem // So sánh toàn bộ nội dung
-        }
+        override fun areItemsTheSame(oldItem: Order, newItem: Order): Boolean = oldItem.id == newItem.id
+        override fun areContentsTheSame(oldItem: Order, newItem: Order): Boolean = oldItem == newItem
     }
 }
