@@ -9,8 +9,6 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.ui.semantics.dismiss
-import androidx.compose.ui.semantics.text
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.appfood.R
@@ -21,20 +19,22 @@ import com.example.appfood.presentation.viewmodel.HistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
-@AndroidEntryPoint // Quan trọng để dùng Hilt
+@AndroidEntryPoint
 class OrderHistoryActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityOrderHistoryBinding
     private lateinit var adapter: OrderAdapter
-    private val viewModel: HistoryViewModel by viewModels() // Sử dụng ViewModel
+    private val viewModel: HistoryViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityOrderHistoryBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        
         binding.btnBack.setOnClickListener {
-            finish() // Đóng Activity hiện tại để quay về màn hình trước
+            finish()
         }
+        
         setupRecyclerView()
         observeData()
     }
@@ -50,13 +50,11 @@ class OrderHistoryActivity : AppCompatActivity() {
     }
 
     private fun observeData() {
-        // Hiện ProgressBar khi bắt đầu lấy dữ liệu
         binding.progressBar.visibility = View.VISIBLE
         binding.layoutEmpty.visibility = View.GONE
 
         lifecycleScope.launch {
             viewModel.orders.collect { orderList ->
-                // Ẩn ProgressBar khi dữ liệu đã về
                 binding.progressBar.visibility = View.GONE
 
                 if (orderList.isEmpty()) {
