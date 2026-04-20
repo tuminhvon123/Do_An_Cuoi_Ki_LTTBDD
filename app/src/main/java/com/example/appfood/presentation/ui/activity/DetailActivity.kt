@@ -13,6 +13,7 @@ import com.example.appfood.domain.model.Food
 import com.example.appfood.presentation.viewmodel.CartViewModel
 import com.example.appfood.util.Extensions.formatCurrency
 import com.example.appfood.R
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -38,6 +39,21 @@ class DetailActivity : AppCompatActivity() {
 
         setupButtons()
         setupCartObserver()
+        checkAdminRole()
+    }
+
+    private fun checkAdminRole() {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null && user.email == "admin@gmail.com") {
+            binding.btnEditFood.visibility = View.VISIBLE
+            binding.btnEditFood.setOnClickListener {
+                val intent = Intent(this, AddFoodActivity::class.java)
+                intent.putExtra("food", currentFood)
+                startActivity(intent)
+            }
+        } else {
+            binding.btnEditFood.visibility = View.GONE
+        }
     }
 
     private fun setupButtons() {
@@ -101,6 +117,18 @@ class DetailActivity : AppCompatActivity() {
             binding.btnAddToCart.isEnabled = false
             binding.btnAddToCart.text = "HẾT HÀNG"
             binding.btnAddToCart.setBackgroundColor(android.graphics.Color.GRAY)
+        } else {
+            binding.btnAddToCart.isEnabled = true
+            binding.btnAddToCart.text = "Thêm vào giỏ hàng"
+            binding.btnAddToCart.setBackgroundColor(getColor(R.color.teal_primary))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Khi quay lại từ trang Sửa, ta không có cơ chế update tự động ở DetailActivity (do dữ liệu lấy từ Intent cũ)
+        // Trong một dự án thực tế, nên dùng ViewModel/Flow để observe food từ DB theo ID.
+        // Tuy nhiên để "ít thay đổi code cũ", người dùng có thể quay lại trang chủ rồi vào lại để thấy thay đổi.
+        // Hoặc ta có thể fetch lại nếu cần.
     }
 }

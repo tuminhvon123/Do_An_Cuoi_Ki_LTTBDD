@@ -42,6 +42,21 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:tint="@color/teal_primary" />
 
+                <!-- Edit Button for Admin -->
+                <ImageButton
+                    android:id="@+id/btnEditFood"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="12dp"
+                    android:background="@drawable/bg_circle_white"
+                    android:elevation="4dp"
+                    android:src="@android:drawable/ic_menu_edit"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toStartOf="@id/layoutCart"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/teal_primary" />
+
                 <!-- Giỏ hàng ở góc phải -->
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layoutCart"
