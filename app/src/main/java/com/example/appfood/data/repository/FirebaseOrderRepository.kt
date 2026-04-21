@@ -56,28 +56,40 @@ class FirebaseOrderRepository @Inject constructor() : OrderRepository {
         }
     }
 
-    override suspend fun getUserOrders(userId: String): Flow<List<Order>> {
+    override fun getUserOrders(userId: String): Flow<List<Order>> {
         val ordersFlow = MutableStateFlow<List<Order>>(emptyList())
 
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        val isAdmin = currentUser?.email == "admin@gmail.com"
+
         try {
-            ordersRef.orderByChild("userId").equalTo(userId)
-                .addValueEventListener(object : ValueEventListener {
-                    override fun onDataChange(snapshot: DataSnapshot) {
-                        val orders = mutableListOf<Order>()
-                        for (child in snapshot.children) {
-                            val order = child.getValue(Order::class.java)
-                            if (order != null) {
-                                orders.add(order)
-                            }
+            val query = if (isAdmin) {
+                // 👑 ADMIN → lấy tất cả
+                ordersRef
+            } else {
+                // 👤 USER → lọc theo userId
+                ordersRef.orderByChild("userId").equalTo(userId)
+            }
+
+            query.addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val orders = mutableListOf<Order>()
+
+                    for (child in snapshot.children) {
+                        val order = child.getValue(Order::class.java)
+                        if (order != null) {
+                            orders.add(order)
                         }
-                        ordersFlow.value = orders
-                        Log.d(TAG, "Got ${orders.size} orders for user $userId")
                     }
 
-                    override fun onCancelled(error: DatabaseError) {
-                        Log.e(TAG, "Error getting user orders: ${error.message}")
-                    }
-                })
+                    ordersFlow.value = orders
+                    Log.d(TAG, "Got ${orders.size} orders | isAdmin = $isAdmin")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    Log.e(TAG, "Error getting orders: ${error.message}")
+                }
+            })
         } catch (e: Exception) {
             Log.e(TAG, "Error setting up listener: ${e.message}", e)
         }

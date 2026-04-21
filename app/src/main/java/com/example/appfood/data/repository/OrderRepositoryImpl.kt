@@ -40,23 +40,34 @@ class OrderRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getUserOrders(userId: String): Flow<List<Order>> = callbackFlow {
+    override fun getUserOrders(userId: String): Flow<List<Order>> = callbackFlow {
+        val currentUser = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser
+        val isAdmin = currentUser?.email == "admin@gmail.com"
+
         val db = FirebaseFirestore.getInstance()
-        val listener = db.collection("orders")
-            .whereEqualTo("userId", userId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    close(error)
-                    return@addSnapshotListener
-                }
-                val orders = snapshot?.documents?.mapNotNull { doc ->
-                    val order = doc.toObject(Order::class.java)
-                    order?.apply {
-                        id = doc.id
-                    }
-                } ?: emptyList()
-                trySend(orders)
+
+        val query = if (isAdmin) {
+            // 👑 ADMIN → lấy tất cả
+            db.collection("orders")
+        } else {
+            // 👤 USER → lọc theo userId
+            db.collection("orders").whereEqualTo("userId", userId)
+        }
+
+        val listener = query.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
             }
+
+            val orders = snapshot?.documents?.mapNotNull { doc ->
+                val order = doc.toObject(Order::class.java)
+                order?.apply { id = doc.id }
+            } ?: emptyList()
+
+            trySend(orders)
+        }
+
         awaitClose { listener.remove() }
     }
 

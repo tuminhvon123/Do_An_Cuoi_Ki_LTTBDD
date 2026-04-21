@@ -27,26 +27,50 @@ class HistoryViewModel @Inject constructor(
     init {
         loadOrders()
     }
-
+    fun updateOrderStatus(orderId: String, status: String, onSuccess: () -> Unit) {
+        viewModelScope.launch {
+            val result = orderRepository.updateOrderStatus(orderId, status)
+            result.onSuccess {
+                onSuccess()
+            }.onFailure {
+                android.util.Log.e("HISTORY", "Lỗi cập nhật trạng thái: ${it.message}")
+            }
+        }
+    }
     fun loadOrders() {
-        val currentUserId = auth.currentUser?.uid
+        val currentUser = auth.currentUser
+        val currentUserId = currentUser?.uid
+        val isAdmin = currentUser?.email == "admin@gmail.com"
 
-        // Nếu đã đăng nhập, dùng UID; nếu không thì kiểm tra guest ID
-        val userId = currentUserId ?: getGuestUserId()
+        // Nếu không phải admin mới cần userId
+        val userId = if (!isAdmin) {
+            currentUserId ?: getGuestUserId()
+        } else {
+            "ADMIN" // giá trị giả, không dùng để filter
+        }
 
-        if (userId == null) {
+        if (!isAdmin && userId == null) {
             android.util.Log.e("HISTORY", "Chưa đăng nhập và không có guest ID!")
             _orders.value = emptyList()
             return
         }
 
-        android.util.Log.d("HISTORY", "Đang tải đơn cho user: $userId")
+        android.util.Log.d("HISTORY", "isAdmin: $isAdmin")
 
         viewModelScope.launch {
             try {
-                orderRepository.getUserOrders(userId).collect { orderList ->
-                    android.util.Log.d("HISTORY", "Tìm thấy ${orderList.size} đơn hàng")
-                    _orders.value = orderList.sortedByDescending { it.createdAt }
+                orderRepository.getUserOrders(userId!!).collect { orderList ->
+
+                    val result = if (isAdmin) {
+                        // 👑 ADMIN → lấy tất cả (KHÔNG filter)
+                        orderList
+                    } else {
+                        // 👤 USER → giữ nguyên
+                        orderList
+                    }
+
+                    android.util.Log.d("HISTORY", "Hiển thị ${result.size} đơn hàng")
+                    _orders.value = result.sortedByDescending { it.createdAt }
                 }
             } catch (e: Exception) {
                 android.util.Log.e("HISTORY", "Lỗi tải đơn: ${e.message}")

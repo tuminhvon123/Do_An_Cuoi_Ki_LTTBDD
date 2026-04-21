@@ -14,7 +14,9 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderAdapter(
-    private val onItemClick: (Order) -> Unit
+    private val isAdmin: Boolean,
+    private val onItemClick: (Order) -> Unit,
+    private val onUpdateStatus: (Order) -> Unit
 ) : ListAdapter<Order, OrderAdapter.OrderViewHolder>(OrderDiffCallback()) {
 
     inner class OrderViewHolder(private val binding: ItemOrderBinding) :
@@ -46,8 +48,6 @@ class OrderAdapter(
                     "cancelled" -> "Đã hủy"
                     else -> order.status
                 }
-                txtStatus.text = statusText
-
                 val colorRes = when (order.status.uppercase()) {
                     "PENDING" -> android.R.color.holo_orange_dark
                     "CONFIRMED" -> android.R.color.holo_blue_dark
@@ -55,6 +55,17 @@ class OrderAdapter(
                     "CANCELLED" -> android.R.color.holo_red_dark
                     else -> android.R.color.black
                 }
+                txtStatus.text = statusText
+                txtStatus.setTextColor(ContextCompat.getColor(binding.root.context, colorRes))
+
+                if (isAdmin && order.status.lowercase() == "pending") {
+                    txtStatus.setOnClickListener {
+                        onUpdateStatus(order)
+                    }
+                } else {
+                    txtStatus.setOnClickListener(null)
+                }
+
                 txtStatus.setTextColor(ContextCompat.getColor(root.context, colorRes))
 
                 // Ngày

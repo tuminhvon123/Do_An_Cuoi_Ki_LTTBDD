@@ -12,6 +12,8 @@ import com.example.appfood.domain.model.Order
 import com.example.appfood.presentation.adapter.OrderAdapter
 import com.example.appfood.presentation.viewmodel.HistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -57,11 +59,22 @@ class OrderHistoryActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        val isAdmin = currentUser?.email == "admin@gmail.com"
+
         adapter = OrderAdapter(
+            isAdmin = isAdmin,
             onItemClick = { order ->
                 openOrderDetail(order)
+            },
+            onUpdateStatus = { order ->
+                viewModel.updateOrderStatus(order.id, "completed") {
+                    Toast.makeText(this, "Đã chuyển sang hoàn thành", Toast.LENGTH_SHORT).show()
+                }
             }
         )
+
         binding.recyclerOrders.apply {
             layoutManager = LinearLayoutManager(this@OrderHistoryActivity)
             adapter = this@OrderHistoryActivity.adapter

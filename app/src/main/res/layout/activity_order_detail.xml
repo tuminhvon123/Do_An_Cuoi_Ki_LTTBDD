@@ -23,7 +23,7 @@
 
     <View
         android:id="@+id/topBg"
-        android:layout_width="413dp"
+        android:layout_width="match_parent"
         android:layout_height="92dp"
         android:background="@color/teal_primary"
         app:layout_constraintTop_toTopOf="parent"

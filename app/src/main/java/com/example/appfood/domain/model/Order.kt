@@ -16,6 +16,9 @@ data class Order(
     val notes: String = "",
     val address: String = "",
     val tableNumber: String = "",
+    var earnedPoints: Int = 0,
+    var usedPoints: Int = 0,
+    var isPointAdded: Boolean = false,
     var rating: Float = 0f,
     var feedback: String = ""
 ) : Serializable {
