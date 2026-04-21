@@ -65,10 +65,6 @@ class OrderAdapter(
                 orderRatingBar.visibility = View.GONE
                 txtFeedback.visibility = View.GONE
 
-                // Button chi tiết đơn hàng
-                btnViewDetail.setOnClickListener {
-                    onItemClick(order)
-                }
             }
             binding.root.setOnClickListener {
                 onItemClick(order)
