@@ -3,12 +3,17 @@ package com.example.appfood.presentation.ui.activity
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.bumptech.glide.Glide
 import com.example.appfood.R
 import com.example.appfood.util.Extensions.showNotification
 import com.google.firebase.auth.FirebaseAuth
@@ -22,6 +27,8 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var edtPhone: EditText
     private lateinit var edtAddress: EditText
     private lateinit var edtEmail: EditText
+    private lateinit var edtProfileImageLink: EditText
+    private lateinit var imgProfile: ImageView
     private lateinit var btnSave: Button
     private lateinit var btnLogout: Button
     private lateinit var btnBack: ImageButton
@@ -38,18 +45,19 @@ class ProfileActivity : AppCompatActivity() {
         auth = FirebaseAuth.getInstance()
         db = FirebaseFirestore.getInstance()
 
-        // CHỐT CHẶN GUEST MODE
         val currentUser = auth.currentUser
         if (currentUser == null) {
             showGuestDialog()
             return
         }
 
-        // Ánh xạ ID (Đã giải quyết xung đột)
+        // Ánh xạ ID
         edtName = findViewById(R.id.edtProfileName)
         edtPhone = findViewById(R.id.edtProfilePhone)
         edtAddress = findViewById(R.id.edtProfileAddress)
         edtEmail = findViewById(R.id.edtProfileEmail)
+        edtProfileImageLink = findViewById(R.id.edtProfileImageLink)
+        imgProfile = findViewById(R.id.imgProfile)
         btnSave = findViewById(R.id.btnSaveProfile)
         btnLogout = findViewById(R.id.btnLogout)
         btnBack = findViewById(R.id.btnBack)
@@ -60,17 +68,31 @@ class ProfileActivity : AppCompatActivity() {
         tvUserEmail.text = userEmail
         edtEmail.setText(userEmail)
 
-        // Hiện nút đăng xuất khi đã đăng nhập
-        btnLogout.visibility = View.VISIBLE
-
-        // "Gán cứng" quyền Admin
         if (userEmail == "admin@gmail.com") {
             btnAdminPanel.visibility = View.VISIBLE
-        } else {
-            btnAdminPanel.visibility = View.GONE
         }
 
         loadUserProfile()
+        setupListeners()
+    }
+
+    private fun setupListeners() {
+        // Preview ảnh khi dán link
+        edtProfileImageLink.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val url = s.toString().trim()
+                if (url.isNotEmpty()) {
+                    Glide.with(this@ProfileActivity)
+                        .load(url)
+                        .placeholder(android.R.drawable.ic_menu_myplaces)
+                        .error(android.R.drawable.ic_menu_myplaces)
+                        .circleCrop()
+                        .into(imgProfile)
+                }
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
 
         btnAdminPanel.setOnClickListener {
             startActivity(Intent(this, AddFoodActivity::class.java))
@@ -78,9 +100,7 @@ class ProfileActivity : AppCompatActivity() {
 
         btnSave.setOnClickListener { saveUserProfile() }
 
-        btnBack.setOnClickListener {
-            finish()
-        }
+        btnBack.setOnClickListener { finish() }
 
         btnLogout.setOnClickListener {
             auth.signOut()
@@ -94,15 +114,13 @@ class ProfileActivity : AppCompatActivity() {
     private fun showGuestDialog() {
         AlertDialog.Builder(this)
             .setTitle("Yêu cầu đăng nhập")
-            .setMessage("Bạn cần đăng nhập để xem và quản lý hồ sơ cá nhân. Bạn có muốn đăng nhập ngay bây giờ không?")
+            .setMessage("Bạn cần đăng nhập để xem và quản lý hồ sơ cá nhân.")
             .setCancelable(false)
             .setPositiveButton("Đăng nhập") { _, _ ->
                 startActivity(Intent(this, LoginActivity::class.java))
                 finish()
             }
-            .setNegativeButton("Tiếp tục mua hàng") { _, _ ->
-                finish()
-            }
+            .setNegativeButton("Quay lại") { _, _ -> finish() }
             .show()
     }
 
@@ -114,10 +132,13 @@ class ProfileActivity : AppCompatActivity() {
                     edtName.setText(document.getString("fullName") ?: "")
                     edtPhone.setText(document.getString("phone") ?: "")
                     edtAddress.setText(document.getString("address") ?: "")
+                    val imageUrl = document.getString("profileImage") ?: ""
+                    edtProfileImageLink.setText(imageUrl)
+                    
+                    if (imageUrl.isNotEmpty()) {
+                        Glide.with(this).load(imageUrl).circleCrop().into(imgProfile)
+                    }
                 }
-            }
-            .addOnFailureListener {
-                showNotification("Không thể tải dữ liệu", isError = true, isTop = true)
             }
     }
 
@@ -126,25 +147,22 @@ class ProfileActivity : AppCompatActivity() {
         val name = edtName.text.toString().trim()
         val phone = edtPhone.text.toString().trim()
         val address = edtAddress.text.toString().trim()
-
-        if (name.isEmpty() || phone.isEmpty() || address.isEmpty()) {
-            showNotification("Vui lòng không để trống thông tin!", isError = true, isTop = true)
-            return
-        }
+        val profileImage = edtProfileImageLink.text.toString().trim()
 
         val userMap = mapOf(
             "fullName" to name,
             "phone" to phone,
-            "address" to address
+            "address" to address,
+            "profileImage" to profileImage
         )
 
         db.collection("Users").document(user.uid)
             .set(userMap, com.google.firebase.firestore.SetOptions.merge())
             .addOnSuccessListener {
-                showNotification("Cập nhật hồ sơ thành công!", isTop = true)
+                Toast.makeText(this, "Cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
-                showNotification("Lỗi cập nhật: ${e.message}", isError = true, isTop = true)
+                Toast.makeText(this, "Lỗi: ${e.message}", Toast.LENGTH_SHORT).show()
             }
     }
 }

@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.appfood.databinding.ItemFoodBinding
 import com.example.appfood.domain.model.Food
-import com.example.appfood.util.Extensions.formatCurrency
+import java.text.DecimalFormat
 
 class FoodAdapter(
     private var items: List<Food>,
@@ -26,23 +26,27 @@ class FoodAdapter(
         
         holder.binding.tvFoodTitle.text = item.title
         
-        // Định dạng giá tiền: 50,000 VNĐ
-        holder.binding.tvFoodPrice.text = item.price.formatCurrency()
+        val decimalFormat = DecimalFormat("#,###")
+        holder.binding.tvFoodPrice.text = "${decimalFormat.format(item.price)} VNĐ"
         
-        // Hiển thị trạng thái Hết hàng (Sold Out) - Một yêu cầu trong task của bạn
+        // Hiển thị nhãn Bán chạy
+        if (item.isBestSeller) {
+            holder.binding.tvBestSeller.visibility = View.VISIBLE
+        } else {
+            holder.binding.tvBestSeller.visibility = View.GONE
+        }
+
+        // Hiển thị trạng thái Hết hàng
         if (item.isSoldOut) {
             holder.binding.tvSoldOut.visibility = View.VISIBLE
-            holder.binding.imgFood.alpha = 0.5f // Làm mờ ảnh khi hết hàng
+            holder.binding.imgFood.alpha = 0.5f
         } else {
             holder.binding.tvSoldOut.visibility = View.GONE
             holder.binding.imgFood.alpha = 1.0f
         }
 
-        // Load ảnh món ăn
         Glide.with(holder.itemView.context)
             .load(item.imageUrl)
-            .override(400, 400) // Bóp dung lượng ảnh trước khi cho vào RAM
-            .centerCrop()
             .into(holder.binding.imgFood)
 
         holder.itemView.setOnClickListener { onItemClick(item) }
@@ -50,7 +54,6 @@ class FoodAdapter(
 
     override fun getItemCount(): Int = items.size
 
-    // Hàm cập nhật danh sách (cho chức năng tìm kiếm hoặc lọc category)
     fun updateList(newList: List<Food>) {
         items = newList
         notifyDataSetChanged()

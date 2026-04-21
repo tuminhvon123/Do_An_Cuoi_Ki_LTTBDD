@@ -11,7 +11,9 @@ data class Food(
     var categoryId: Int = 0,
     var isSoldOut: Boolean = false,
     var topping: String = "",
-    var sizes: List<FoodSize> = emptyList()
+    var sizes: List<FoodSize> = emptyList(),
+    var salesCount: Int = 0,
+    var isBestSeller: Boolean = false // Field ảo để hiển thị nhãn
 ) : Serializable
 
 data class FoodSize(

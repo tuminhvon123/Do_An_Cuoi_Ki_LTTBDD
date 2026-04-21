@@ -25,6 +25,23 @@
                 android:scaleType="centerCrop"
                 android:src="@android:drawable/ic_menu_gallery" />
 
+            <!-- Nhãn BÁN CHẠY -->
+            <TextView
+                android:id="@+id/tvBestSeller"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_margin="8dp"
+                android:background="@drawable/bg_best_seller"
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="BÁN CHẠY"
+                android:textColor="@color/white"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+
             <TextView
                 android:id="@+id/tvSoldOut"
                 android:layout_width="wrap_content"
@@ -73,8 +90,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center_vertical"
-                android:orientation="horizontal"
-                android:visibility="gone">
+                android:orientation="horizontal">
 
                 <ImageView
                     android:layout_width="12dp"
@@ -83,7 +99,7 @@
                     app:tint="#FFC107" />
 
                 <TextView
-                    android:id="@+id/tvFoodRating"
+                    android:id="@+id/tvRatingAndSales"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
