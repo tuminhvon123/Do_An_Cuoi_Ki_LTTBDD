@@ -41,6 +41,8 @@ class FoodAdapter(
         // Load ảnh món ăn
         Glide.with(holder.itemView.context)
             .load(item.imageUrl)
+            .override(400, 400) // Bóp dung lượng ảnh trước khi cho vào RAM
+            .centerCrop()
             .into(holder.binding.imgFood)
 
         holder.itemView.setOnClickListener { onItemClick(item) }
