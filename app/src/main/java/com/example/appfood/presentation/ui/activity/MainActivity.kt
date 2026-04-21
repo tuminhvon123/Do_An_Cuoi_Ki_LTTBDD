@@ -1,5 +1,7 @@
 package com.example.appfood.presentation.ui.activity
 
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
@@ -7,6 +9,7 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.CheckBox
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -40,6 +43,7 @@ class MainActivity : AppCompatActivity() {
     private var foodList = mutableListOf<Food>()
     private var categoryList = mutableListOf<Category>()
     private val db = FirebaseFirestore.getInstance()
+    private var dontShowProfileReminder = false // Biến session-only, sẽ reset khi app bị kill
 
     private val sliderHandler = Handler(Looper.getMainLooper())
     private val sliderRunnable = Runnable {
@@ -71,6 +75,65 @@ class MainActivity : AppCompatActivity() {
         
         // Cập nhật: Lấy dữ liệu REALTIME (Tự động hiện món mới ngay khi thêm)
         observeFoodsFromFirestore()
+
+        // Kiểm tra thông tin profile khi đăng nhập
+        checkUserProfile()
+    }
+
+    private fun checkUserProfile() {
+        val auth = FirebaseAuth.getInstance()
+        val currentUser = auth.currentUser ?: return
+
+        // Kiểm tra xem đã tick "Không hiện lại" trong session chưa
+        if (dontShowProfileReminder) {
+            return
+        }
+
+        // Kiểm tra thông tin user từ Firestore
+        db.collection("Users").document(currentUser.uid).get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    val fullName = document.getString("fullName") ?: ""
+                    val phone = document.getString("phone") ?: ""
+                    val address = document.getString("address") ?: ""
+
+                    // Nếu thiếu thông tin thì hiện dialog
+                    if (fullName.isEmpty() || phone.isEmpty() || address.isEmpty()) {
+                        showProfileReminderDialog()
+                    }
+                } else {
+                    // Chưa có document thì hiện dialog
+                    showProfileReminderDialog()
+                }
+            }
+            .addOnFailureListener {
+                // Lỗi thì không hiện dialog
+            }
+    }
+
+    private fun showProfileReminderDialog() {
+        val dialogView = View.inflate(this, R.layout.dialog_profile_reminder, null)
+        val checkBoxDontShow = dialogView.findViewById<CheckBox>(R.id.checkBoxDontShow)
+
+        AlertDialog.Builder(this)
+            .setTitle("Cập nhật thông tin cá nhân")
+            .setMessage("Để mua hàng thuận tiện hơn, vui lòng cập nhật đầy đủ thông tin tên, số điện thoại và địa chỉ giao hàng.")
+            .setView(dialogView)
+            .setCancelable(false)
+            .setPositiveButton("Cập nhật profile") { _, _ ->
+                // Lưu trạng thái checkbox nếu được tick (session-only)
+                if (checkBoxDontShow.isChecked) {
+                    dontShowProfileReminder = true
+                }
+                startActivity(Intent(this, ProfileActivity::class.java))
+            }
+            .setNegativeButton("Để sau") { _, _ ->
+                // Lưu trạng thái checkbox nếu được tick (session-only)
+                if (checkBoxDontShow.isChecked) {
+                    dontShowProfileReminder = true
+                }
+            }
+            .show()
     }
 
     private fun setupAdminFab() {

@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,7 @@ class ProfileActivity : AppCompatActivity() {
     private lateinit var edtEmail: EditText
     private lateinit var btnSave: Button
     private lateinit var btnLogout: Button
+    private lateinit var btnBack: ImageButton
     private lateinit var btnAdminPanel: Button
     private lateinit var tvUserEmail: TextView
 
@@ -50,6 +52,7 @@ class ProfileActivity : AppCompatActivity() {
         edtEmail = findViewById(R.id.edtProfileEmail)
         btnSave = findViewById(R.id.btnSaveProfile)
         btnLogout = findViewById(R.id.btnLogout)
+        btnBack = findViewById(R.id.btnBack)
         btnAdminPanel = findViewById(R.id.btnAdminPanel)
         tvUserEmail = findViewById(R.id.tvUserEmail)
 
@@ -72,6 +75,10 @@ class ProfileActivity : AppCompatActivity() {
 
         btnSave.setOnClickListener { saveUserProfile() }
         
+        btnBack.setOnClickListener {
+            finish()
+        }
+
         btnLogout.setOnClickListener {
             auth.signOut()
             val intent = Intent(this, LoginActivity::class.java)
@@ -129,7 +136,7 @@ class ProfileActivity : AppCompatActivity() {
         )
 
         db.collection("Users").document(user.uid)
-            .update(userMap)
+            .set(userMap, com.google.firebase.firestore.SetOptions.merge())
             .addOnSuccessListener {
                 Toast.makeText(this, "Cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show()
             }
