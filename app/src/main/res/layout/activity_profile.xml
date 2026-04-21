@@ -34,7 +34,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="admin@gmail.com"
+            android:text=""
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold" />
@@ -131,7 +131,7 @@
                 android:background="#EEEEEE"
                 android:enabled="false"
                 android:paddingHorizontal="16dp"
-                android:text="khachhang@email.com"
+                android:text=""
                 android:textColor="#888888" />
 
             <Button
@@ -156,6 +156,7 @@
             android:text="ĐĂNG XUẤT"
             android:textColor="@color/white"
             android:textStyle="bold"
+            android:visibility="gone"
             app:cornerRadius="12dp" />
 
     </LinearLayout>
