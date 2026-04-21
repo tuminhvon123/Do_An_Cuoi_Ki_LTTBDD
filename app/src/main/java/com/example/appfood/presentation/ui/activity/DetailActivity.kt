@@ -15,6 +15,7 @@ import com.example.appfood.presentation.adapter.FoodReviewAdapter
 import com.example.appfood.presentation.viewmodel.CartViewModel
 import com.example.appfood.presentation.viewmodel.DetailViewModel
 import com.example.appfood.util.Extensions.formatCurrency
+import com.example.appfood.util.Extensions.showNotification
 import com.example.appfood.R
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
@@ -34,7 +35,7 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Nhận dữ liệu Food từ Intent
+        // Nhận dữ liệu Food từ Intent được gửi từ màn hình trước
         val food = intent.getSerializableExtra("food") as? Food
         currentFood = food
 
@@ -43,7 +44,7 @@ class DetailActivity : AppCompatActivity() {
 
         food?.let {
             displayFoodDetail(it)
-            // Load ratings for this food
+            // Load các đánh giá của món ăn này từ Firestore
             detailViewModel.loadFoodRatings(it.id)
             detailViewModel.loadAverageRating(it.id)
             detailViewModel.loadRatingCount(it.id)
@@ -63,6 +64,7 @@ class DetailActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
+        // Lắng nghe danh sách đánh giá từ ViewModel
         lifecycleScope.launch {
             detailViewModel.ratings.collect { ratings ->
                 if (ratings.isEmpty()) {
@@ -76,6 +78,7 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
+        // Lắng nghe điểm đánh giá trung bình
         lifecycleScope.launch {
             detailViewModel.averageRating.collect { avg ->
                 if (avg > 0) {
@@ -87,6 +90,7 @@ class DetailActivity : AppCompatActivity() {
             }
         }
 
+        // Lắng nghe tổng số lượng đánh giá
         lifecycleScope.launch {
             detailViewModel.ratingCount.collect { count ->
                 if (count > 0) {
@@ -122,14 +126,14 @@ class DetailActivity : AppCompatActivity() {
             addToCart()
         }
 
-        // Click vào icon giỏ hàng ở góc phải
+        // Click vào icon giỏ hàng ở góc phải để mở màn hình CartActivity
         binding.btnCartDetail.setOnClickListener {
             startActivity(Intent(this, CartActivity::class.java))
         }
     }
 
     private fun setupCartObserver() {
-        // Lắng nghe sự thay đổi của giỏ hàng để cập nhật Badge (số lượng)
+        // Lắng nghe sự thay đổi của giỏ hàng để cập nhật Badge (số lượng) hiển thị trên icon giỏ hàng
         lifecycleScope.launch {
             cartViewModel.cartSummary.collect { summary ->
                 updateCartBadge(summary.first)
@@ -151,8 +155,11 @@ class DetailActivity : AppCompatActivity() {
     private fun addToCart() {
         currentFood?.let { food ->
             if (!food.isSoldOut) {
+                // Bước 1: Gọi hàm addToCart trong CartViewModel để lưu món ăn vào SharedPreferences/Database
                 cartViewModel.addToCart(food, quantity = 1, topping = food.topping)
-                Toast.makeText(this, "Đã thêm ${food.title} vào giỏ hàng", Toast.LENGTH_SHORT).show()
+                
+                // Bước 2: Hiển thị thông báo In-App Notification (trượt từ trên xuống) để xác nhận
+                showNotification("Đã thêm ${food.title} vào giỏ hàng", isTop = true)
             }
         }
     }
@@ -169,7 +176,7 @@ class DetailActivity : AppCompatActivity() {
             .load(food.imageUrl)
             .into(binding.imgDetail)
             
-        // Nếu hết hàng thì disable nút đặt hàng
+        // Kiểm tra trạng thái món ăn để hiển thị nút đặt hàng phù hợp
         if (food.isSoldOut) {
             binding.btnAddToCart.isEnabled = false
             binding.btnAddToCart.text = "HẾT HÀNG"
@@ -179,13 +186,5 @@ class DetailActivity : AppCompatActivity() {
             binding.btnAddToCart.text = "Thêm vào giỏ hàng"
             binding.btnAddToCart.setBackgroundColor(getColor(R.color.teal_primary))
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // Khi quay lại từ trang Sửa, ta không có cơ chế update tự động ở DetailActivity (do dữ liệu lấy từ Intent cũ)
-        // Trong một dự án thực tế, nên dùng ViewModel/Flow để observe food từ DB theo ID.
-        // Tuy nhiên để "ít thay đổi code cũ", người dùng có thể quay lại trang chủ rồi vào lại để thấy thay đổi.
-        // Hoặc ta có thể fetch lại nếu cần.
     }
 }

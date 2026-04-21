@@ -8,9 +8,9 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.appfood.R
+import com.example.appfood.util.Extensions.showNotification
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.AndroidEntryPoint
@@ -114,7 +114,7 @@ class ProfileActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
-                Toast.makeText(this, "Không thể tải dữ liệu", Toast.LENGTH_SHORT).show()
+                showNotification("Không thể tải dữ liệu", isError = true, isTop = true)
             }
     }
 
@@ -125,7 +125,7 @@ class ProfileActivity : AppCompatActivity() {
         val address = edtAddress.text.toString().trim()
 
         if (name.isEmpty() || phone.isEmpty() || address.isEmpty()) {
-            Toast.makeText(this, "Vui lòng không để trống thông tin!", Toast.LENGTH_SHORT).show()
+            showNotification("Vui lòng không để trống thông tin!", isError = true, isTop = true)
             return
         }
 
@@ -138,10 +138,10 @@ class ProfileActivity : AppCompatActivity() {
         db.collection("Users").document(user.uid)
             .set(userMap, com.google.firebase.firestore.SetOptions.merge())
             .addOnSuccessListener {
-                Toast.makeText(this, "Cập nhật hồ sơ thành công!", Toast.LENGTH_SHORT).show()
+                showNotification("Cập nhật hồ sơ thành công!", isTop = true)
             }
             .addOnFailureListener { e ->
-                Toast.makeText(this, "Lỗi cập nhật: ${e.message}", Toast.LENGTH_SHORT).show()
+                showNotification("Lỗi cập nhật: ${e.message}", isError = true, isTop = true)
             }
     }
 }

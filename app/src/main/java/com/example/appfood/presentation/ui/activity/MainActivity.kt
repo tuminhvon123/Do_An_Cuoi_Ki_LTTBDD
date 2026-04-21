@@ -3,14 +3,17 @@ package com.example.appfood.presentation.ui.activity
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.widget.CheckBox
-import android.widget.Toast
+import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -20,15 +23,19 @@ import androidx.viewpager2.widget.ViewPager2
 import com.example.appfood.presentation.ui.adapter.BannerAdapter
 import com.example.appfood.presentation.ui.adapter.CategoryAdapter
 import com.example.appfood.presentation.ui.adapter.FoodAdapter
+import com.example.appfood.presentation.adapter.SearchHistoryAdapter
 import com.example.appfood.databinding.ActivityMainBinding
 import com.example.appfood.domain.model.Category
 import com.example.appfood.domain.model.Food
 import com.example.appfood.presentation.viewmodel.MainViewModel
 import com.example.appfood.presentation.viewmodel.CartViewModel
 import com.example.appfood.util.Constants
+import com.example.appfood.util.Extensions.showNotification
 import com.example.appfood.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -39,11 +46,14 @@ class MainActivity : AppCompatActivity() {
     private lateinit var foodAdapter: FoodAdapter
     private lateinit var categoryAdapter: CategoryAdapter
     private lateinit var bannerAdapter: BannerAdapter
-    
+    private lateinit var searchHistoryAdapter: SearchHistoryAdapter
+    private lateinit var sharedPreferences: SharedPreferences
+
     private var foodList = mutableListOf<Food>()
     private var categoryList = mutableListOf<Category>()
+    private var searchHistoryList = mutableListOf<String>()
     private val db = FirebaseFirestore.getInstance()
-    private var dontShowProfileReminder = false // Biến session-only, sẽ reset khi app bị kill
+    private var dontShowProfileReminder = false 
 
     private val sliderHandler = Handler(Looper.getMainLooper())
     private val sliderRunnable = Runnable {
@@ -65,6 +75,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        sharedPreferences = getSharedPreferences("search_history", Context.MODE_PRIVATE)
+        loadSearchHistory()
+
         initCategories() 
         setupBanner()
         setupRecyclerViews()
@@ -73,23 +86,117 @@ class MainActivity : AppCompatActivity() {
         setupBottomNav()
         setupAdminFab()
         
-        // Cập nhật: Lấy dữ liệu REALTIME (Tự động hiện món mới ngay khi thêm)
         observeFoodsFromFirestore()
-
-        // Kiểm tra thông tin profile khi đăng nhập
         checkUserProfile()
+    }
+
+    // --- PHẦN LỊCH SỬ TÌM KIẾM (SEARCH HISTORY) ---
+
+    // 1. Tải lịch sử từ bộ nhớ máy (SharedPreferences) lên danh sách hiển thị
+    private fun loadSearchHistory() {
+        val json = sharedPreferences.getString("history", null)
+        if (json != null) {
+            val type = object : TypeToken<MutableList<String>>() {}.type
+            searchHistoryList = Gson().fromJson(json, type)
+        }
+    }
+
+    // 2. Lưu từ khóa mới khi người dùng nhấn Enter/Search
+    private fun saveSearchQuery(query: String) {
+        if (query.isEmpty()) return
+        
+        // Xóa từ cũ nếu bị trùng để đưa từ mới lên vị trí đầu tiên
+        searchHistoryList.remove(query)
+        searchHistoryList.add(0, query)
+        
+        // Giới hạn tối đa 10 mục lịch sử gần nhất
+        if (searchHistoryList.size > 10) {
+            searchHistoryList.removeAt(searchHistoryList.size - 1)
+        }
+        
+        // Chuyển danh sách sang định dạng JSON để lưu vào máy
+        val json = Gson().toJson(searchHistoryList)
+        sharedPreferences.edit().putString("history", json).apply()
+        updateSearchHistoryUI()
+    }
+
+    // 3. Xóa một mục cụ thể trong lịch sử (được gọi khi nhấn giữ/long click)
+    private fun deleteSearchQuery(query: String) {
+        searchHistoryList.remove(query)
+        val json = Gson().toJson(searchHistoryList)
+        sharedPreferences.edit().putString("history", json).apply()
+        updateSearchHistoryUI()
+    }
+
+    private fun setupSearch() {
+        // Cấu hình danh sách Dropdown cho lịch sử tìm kiếm
+        searchHistoryAdapter = SearchHistoryAdapter(
+            searchHistoryList,
+            onItemClick = { query ->
+                // Khi nhấn vào một mục: Điền chữ vào ô và ẩn Dropdown
+                binding.searchEditText.setText(query)
+                binding.searchEditText.setSelection(query.length)
+                binding.cardSearchHistory.visibility = View.GONE
+            },
+            onDeleteClick = { query ->
+                // Khi nhấn xóa: Cập nhật lại danh sách hoặc ẩn nếu hết sạch
+                deleteSearchQuery(query)
+                if (searchHistoryList.isEmpty()) {
+                    binding.cardSearchHistory.visibility = View.GONE
+                }
+            }
+        )
+        binding.rvSearchHistoryDropdown.layoutManager = LinearLayoutManager(this)
+        binding.rvSearchHistoryDropdown.adapter = searchHistoryAdapter
+
+        // Lắng nghe sự kiện nhấn vào ô tìm kiếm để HIỆN DROPDOWN
+        binding.searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus && searchHistoryList.isNotEmpty() && binding.searchEditText.text.isEmpty()) {
+                binding.cardSearchHistory.visibility = View.VISIBLE
+            } else {
+                binding.cardSearchHistory.visibility = View.GONE
+            }
+        }
+
+        // Lắng nghe sự kiện nhấn ENTER (Nút kính lúp) trên bàn phím để LƯU LỊCH SỬ
+        binding.searchEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
+                val query = binding.searchEditText.text.toString().trim()
+                if (query.isNotEmpty()) {
+                    saveSearchQuery(query)
+                }
+                binding.cardSearchHistory.visibility = View.GONE
+            }
+            false
+        }
+
+        // Lắng nghe thay đổi chữ khi gõ để lọc món ăn và ẨN DROPDOWN khi đang gõ
+        binding.searchEditText.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString()
+                binding.cardSearchHistory.visibility = View.GONE
+                
+                // Lọc danh sách món ăn theo tên
+                val filteredList = foodList.filter { it.title.contains(query, ignoreCase = true) }
+                foodAdapter.updateList(filteredList)
+            }
+            override fun afterTextChanged(s: Editable?) {}
+        })
+    }
+
+    private fun updateSearchHistoryUI() {
+        if (::searchHistoryAdapter.isInitialized) {
+            searchHistoryAdapter.updateList(searchHistoryList)
+        }
     }
 
     private fun checkUserProfile() {
         val auth = FirebaseAuth.getInstance()
         val currentUser = auth.currentUser ?: return
 
-        // Kiểm tra xem đã tick "Không hiện lại" trong session chưa
-        if (dontShowProfileReminder) {
-            return
-        }
+        if (dontShowProfileReminder) return
 
-        // Kiểm tra thông tin user từ Firestore
         db.collection("Users").document(currentUser.uid).get()
             .addOnSuccessListener { document ->
                 if (document != null && document.exists()) {
@@ -97,17 +204,12 @@ class MainActivity : AppCompatActivity() {
                     val phone = document.getString("phone") ?: ""
                     val address = document.getString("address") ?: ""
 
-                    // Nếu thiếu thông tin thì hiện dialog
                     if (fullName.isEmpty() || phone.isEmpty() || address.isEmpty()) {
                         showProfileReminderDialog()
                     }
                 } else {
-                    // Chưa có document thì hiện dialog
                     showProfileReminderDialog()
                 }
-            }
-            .addOnFailureListener {
-                // Lỗi thì không hiện dialog
             }
     }
 
@@ -121,27 +223,21 @@ class MainActivity : AppCompatActivity() {
             .setView(dialogView)
             .setCancelable(false)
             .setPositiveButton("Cập nhật profile") { _, _ ->
-                // Lưu trạng thái checkbox nếu được tick (session-only)
-                if (checkBoxDontShow.isChecked) {
-                    dontShowProfileReminder = true
-                }
+                if (checkBoxDontShow.isChecked) dontShowProfileReminder = true
                 startActivity(Intent(this, ProfileActivity::class.java))
             }
             .setNegativeButton("Để sau") { _, _ ->
-                // Lưu trạng thái checkbox nếu được tick (session-only)
-                if (checkBoxDontShow.isChecked) {
-                    dontShowProfileReminder = true
-                }
+                if (checkBoxDontShow.isChecked) dontShowProfileReminder = true
             }
             .show()
     }
 
     private fun setupAdminFab() {
-        // Luôn kiểm tra lại mỗi khi vào trang chủ
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null && user.email == "admin@gmail.com") {
             binding.fabAddFoodAdmin.visibility = View.VISIBLE
             binding.fabAddFoodAdmin.setOnClickListener {
+                // assume AddFoodActivity exists based on context
                 startActivity(Intent(this, AddFoodActivity::class.java))
             }
         } else {
@@ -162,13 +258,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeFoodsFromFirestore() {
-        // Sử dụng addSnapshotListener để theo dõi thay đổi liên tục
         db.collection("Foods").addSnapshotListener { snapshots, e ->
-            if (e != null) {
-                Toast.makeText(this, "Lỗi kết nối dữ liệu: ${e.message}", Toast.LENGTH_SHORT).show()
-                return@addSnapshotListener
-            }
-
+            if (e != null) return@addSnapshotListener
             if (snapshots != null) {
                 foodList.clear()
                 for (doc in snapshots) {
@@ -213,18 +304,6 @@ class MainActivity : AppCompatActivity() {
         binding.recyclerViewFood.isNestedScrollingEnabled = false
     }
 
-    private fun setupSearch() {
-        binding.searchEditText.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val query = s.toString()
-                val filteredList = foodList.filter { it.title.contains(query, ignoreCase = true) }
-                foodAdapter.updateList(filteredList)
-            }
-            override fun afterTextChanged(s: Editable?) {}
-        })
-    }
-
     private fun setupCart() {
         binding.fabCart.setOnClickListener {
              startActivity(Intent(this, CartActivity::class.java))
@@ -251,7 +330,10 @@ class MainActivity : AppCompatActivity() {
     private fun setupBottomNav() {
         binding.bottomNavigationView.setOnItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> true
+                R.id.nav_home -> {
+                    binding.cardSearchHistory.visibility = View.GONE
+                    true
+                }
                 R.id.nav_order -> {
                     startActivity(Intent(this, OrderHistoryActivity::class.java))
                     true
@@ -272,7 +354,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Kiểm tra lại quyền admin mỗi khi quay lại trang chủ (trường hợp vừa đăng nhập xong)
         setupAdminFab()
         sliderHandler.postDelayed(sliderRunnable, Constants.SLIDER_DELAY)
     }
