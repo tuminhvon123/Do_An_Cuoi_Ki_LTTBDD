@@ -51,7 +51,7 @@ class OrderDetailActivity : AppCompatActivity() {
             displayOrderInfo(it)
             // Load ratings for items in this order
             lifecycleScope.launch {
-                viewModel.loadRatingsForOrder(it.items, currentUserId)
+                viewModel.loadRatingsForOrder(it.items, currentUserId, it.id)
                 displayOrderItems(it)
             }
         }

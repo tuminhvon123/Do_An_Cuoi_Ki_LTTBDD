@@ -29,14 +29,17 @@ class OrderDetailViewModel @Inject constructor(
         }
     }
 
-    suspend fun loadRatingsForOrder(items: List<CartItem>, userId: String) {
+    suspend fun loadRatingsForOrder(items: List<CartItem>, userId: String, orderId: String) {
         items.forEach { item ->
             if (!item.isRated) {
-                val rating = foodRatingRepository.getRatingByFoodAndUser(item.foodId, userId)
-                rating?.let {
-                    item.rating = it.rating
-                    item.feedback = it.feedback
-                    item.isRated = true
+                val hasRated = foodRatingRepository.hasUserRatedFood(userId, orderId, item.foodId)
+                if (hasRated) {
+                    val rating = foodRatingRepository.getRatingByFoodAndUser(item.foodId, userId)
+                    rating?.let {
+                        item.rating = it.rating
+                        item.feedback = it.feedback
+                        item.isRated = true
+                    }
                 }
             }
         }

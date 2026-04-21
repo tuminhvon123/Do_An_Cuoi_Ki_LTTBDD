@@ -108,6 +108,11 @@ class CheckoutActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
+            if (selectedDeliveryType == "dine_in" && binding.edtCustomerTable.text.toString().trim().isEmpty()) {
+                Toast.makeText(this, "Vui lòng nhập số bàn", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
             // Show final confirmation dialog
             showConfirmationDialog(customerName, customerPhone, specialNotes)
         }
