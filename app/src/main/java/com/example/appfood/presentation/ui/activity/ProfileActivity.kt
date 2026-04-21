@@ -60,6 +60,9 @@ class ProfileActivity : AppCompatActivity() {
         tvUserEmail.text = userEmail
         edtEmail.setText(userEmail)
 
+        // Hiện nút đăng xuất khi đã đăng nhập
+        btnLogout.visibility = View.VISIBLE
+
         // "Gán cứng" quyền Admin
         if (userEmail == "admin@gmail.com") {
             btnAdminPanel.visibility = View.VISIBLE
@@ -74,7 +77,7 @@ class ProfileActivity : AppCompatActivity() {
         }
 
         btnSave.setOnClickListener { saveUserProfile() }
-        
+
         btnBack.setOnClickListener {
             finish()
         }
