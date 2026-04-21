@@ -14,7 +14,6 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class OrderAdapter(
-    private val onRatingClick: (Order) -> Unit,
     private val onItemClick: (Order) -> Unit
 ) : ListAdapter<Order, OrderAdapter.OrderViewHolder>(OrderDiffCallback()) {
 
@@ -62,27 +61,13 @@ class OrderAdapter(
                 val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
                 txtDate.text = sdf.format(Date(order.createdAt))
 
-                // Rating
-                val isCompleted = order.status.lowercase() in listOf("completed", "done")
-                if (isCompleted) {
-                    if (order.rating > 0) {
-                        btnRating.visibility = View.GONE
-                        orderRatingBar.visibility = View.VISIBLE
-                        orderRatingBar.rating = order.rating
+                // Ẩn rating bar và feedback
+                orderRatingBar.visibility = View.GONE
+                txtFeedback.visibility = View.GONE
 
-                        txtFeedback.visibility =
-                            if (order.feedback.isNotEmpty()) View.VISIBLE else View.GONE
-                        txtFeedback.text = "Nhận xét: ${order.feedback}"
-                    } else {
-                        btnRating.visibility = View.VISIBLE
-                        orderRatingBar.visibility = View.GONE
-                        txtFeedback.visibility = View.GONE
-                        btnRating.setOnClickListener { onRatingClick(order) }
-                    }
-                } else {
-                    btnRating.visibility = View.GONE
-                    orderRatingBar.visibility = View.GONE
-                    txtFeedback.visibility = View.GONE
+                // Button chi tiết đơn hàng
+                btnViewDetail.setOnClickListener {
+                    onItemClick(order)
                 }
             }
             binding.root.setOnClickListener {

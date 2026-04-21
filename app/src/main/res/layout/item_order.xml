@@ -98,15 +98,14 @@
 
         <!-- BUTTON -->
         <Button
-            android:id="@+id/btnRating"
+            android:id="@+id/btnViewDetail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/teal_primary"
-            android:text="⭐ Đánh giá"
+            android:text="Chi tiết đơn hàng"
             android:textAllCaps="false"
-            android:textColor="@color/white"
-            android:visibility="gone" />
+            android:textColor="@color/white" />
 
     </LinearLayout>
 

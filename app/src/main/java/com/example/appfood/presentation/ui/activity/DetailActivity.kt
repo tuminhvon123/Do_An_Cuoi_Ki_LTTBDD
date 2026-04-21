@@ -7,10 +7,13 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.appfood.databinding.ActivityDetailBinding
 import com.example.appfood.domain.model.Food
+import com.example.appfood.presentation.adapter.FoodReviewAdapter
 import com.example.appfood.presentation.viewmodel.CartViewModel
+import com.example.appfood.presentation.viewmodel.DetailViewModel
 import com.example.appfood.util.Extensions.formatCurrency
 import com.example.appfood.R
 import com.google.firebase.auth.FirebaseAuth
@@ -22,7 +25,9 @@ class DetailActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityDetailBinding
     private val cartViewModel: CartViewModel by viewModels()
+    private val detailViewModel: DetailViewModel by viewModels()
     private var currentFood: Food? = null
+    private lateinit var reviewAdapter: FoodReviewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,13 +38,65 @@ class DetailActivity : AppCompatActivity() {
         val food = intent.getSerializableExtra("food") as? Food
         currentFood = food
 
+        setupRecyclerView()
+        setupObservers()
+
         food?.let {
             displayFoodDetail(it)
+            // Load ratings for this food
+            detailViewModel.loadFoodRatings(it.id)
+            detailViewModel.loadAverageRating(it.id)
+            detailViewModel.loadRatingCount(it.id)
         }
 
         setupButtons()
         setupCartObserver()
         checkAdminRole()
+    }
+
+    private fun setupRecyclerView() {
+        reviewAdapter = FoodReviewAdapter()
+        binding.recyclerReviews.apply {
+            layoutManager = LinearLayoutManager(this@DetailActivity)
+            adapter = reviewAdapter
+        }
+    }
+
+    private fun setupObservers() {
+        lifecycleScope.launch {
+            detailViewModel.ratings.collect { ratings ->
+                if (ratings.isEmpty()) {
+                    binding.recyclerReviews.visibility = View.GONE
+                    binding.tvNoReviews.visibility = View.VISIBLE
+                } else {
+                    binding.recyclerReviews.visibility = View.VISIBLE
+                    binding.tvNoReviews.visibility = View.GONE
+                    reviewAdapter.submitList(ratings)
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            detailViewModel.averageRating.collect { avg ->
+                if (avg > 0) {
+                    binding.ratingBarAverage.visibility = View.VISIBLE
+                    binding.ratingBarAverage.rating = avg
+                } else {
+                    binding.ratingBarAverage.visibility = View.GONE
+                }
+            }
+        }
+
+        lifecycleScope.launch {
+            detailViewModel.ratingCount.collect { count ->
+                if (count > 0) {
+                    binding.tvRatingCount.visibility = View.VISIBLE
+                    binding.tvRatingCount.text = "($count đánh giá)"
+                } else {
+                    binding.tvRatingCount.visibility = View.GONE
+                }
+            }
+        }
     }
 
     private fun checkAdminRole() {

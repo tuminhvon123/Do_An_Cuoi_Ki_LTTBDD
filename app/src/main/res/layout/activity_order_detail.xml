@@ -9,18 +9,16 @@
 
     <ImageButton
         android:id="@+id/btnBack"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="40dp"
+        android:layout_marginTop="16dp"
         android:background="@drawable/bg_circle_white"
         android:elevation="4dp"
-        android:padding="12dp"
-        android:scaleType="centerInside"
-        android:src="@android:drawable/ic_media_previous"
+        android:src="@android:drawable/ic_menu_revert"
         app:tint="@color/teal_primary"
-        app:layout_constraintTop_toTopOf="@id/topBg"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <!-- HEADER -->
     <View
@@ -34,17 +32,14 @@
 
     <TextView
         android:id="@+id/txtTitle"
-        android:layout_width="224dp"
-        android:layout_height="48dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
         android:text="Chi tiết đơn hàng"
         android:textColor="@color/white"
         android:textSize="25sp"
-
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.673"
-
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/topBg" />
 
@@ -135,13 +130,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
-                <TextView
-                    android:id="@+id/txtItems"
-                    android:layout_marginTop="6dp"
-                    android:textSize="14sp"
-                    android:textColor="#555555"
+                <LinearLayout
+                    android:id="@+id/itemsContainer"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="vertical" />
 
                 <!-- NOTE -->
                 <TextView

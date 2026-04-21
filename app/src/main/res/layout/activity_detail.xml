@@ -113,6 +113,35 @@
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <RatingBar
+                        android:id="@+id/ratingBarAverage"
+                        style="?android:attr/ratingBarStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:isIndicator="true"
+                        android:numStars="5"
+                        android:progressTint="@color/teal_primary"
+                        android:stepSize="0.5"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/tvRatingCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="(0 đánh giá)"
+                        android:textColor="@color/text_gray"
+                        android:textSize="14sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/tvDetailPrice"
                     android:layout_width="match_parent"
@@ -159,6 +188,34 @@
                     android:text="Thêm phô mai, Thêm sốt..."
                     android:textColor="#666666"
                     android:textSize="16sp" />
+
+                <!-- Reviews Section -->
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Đánh giá từ khách hàng"
+                    android:textColor="@android:color/black"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerReviews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <TextView
+                    android:id="@+id/tvNoReviews"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="Chưa có đánh giá nào"
+                    android:textAlignment="center"
+                    android:textColor="@color/text_gray"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
 
             </LinearLayout>
         </LinearLayout>

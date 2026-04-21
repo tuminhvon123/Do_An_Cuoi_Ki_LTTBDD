@@ -1,9 +1,11 @@
 package com.example.appfood.di
 
 import com.example.appfood.data.repository.CategoryRepositoryImpl
+import com.example.appfood.data.repository.FirebaseFoodRatingRepository
 import com.example.appfood.data.repository.FoodRepositoryImpl
 import com.example.appfood.data.repository.FirebaseOrderRepository
 import com.example.appfood.domain.repository.CategoryRepository
+import com.example.appfood.domain.repository.FoodRatingRepository
 import com.example.appfood.domain.repository.FoodRepository
 import com.example.appfood.domain.repository.OrderRepository
 import dagger.Binds
@@ -15,13 +17,13 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 abstract class RepositoryModule {
-    
+
     @Binds
     @Singleton
     abstract fun bindFoodRepository(
         foodRepositoryImpl: FoodRepositoryImpl
     ): FoodRepository
-    
+
     @Binds
     @Singleton
     abstract fun bindCategoryRepository(
@@ -33,4 +35,10 @@ abstract class RepositoryModule {
     abstract fun bindOrderRepository(
         firebaseOrderRepository: FirebaseOrderRepository
     ): OrderRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindFoodRatingRepository(
+        firebaseFoodRatingRepository: FirebaseFoodRatingRepository
+    ): FoodRatingRepository
 }

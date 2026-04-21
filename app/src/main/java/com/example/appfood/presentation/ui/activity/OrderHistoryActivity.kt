@@ -1,23 +1,18 @@
 package com.example.appfood.presentation.ui.activity
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
 import android.content.Intent
-import android.widget.EditText
-import android.widget.RatingBar
-import android.widget.Toast
+import android.view.View
 import androidx.activity.viewModels
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.appfood.R
 import com.example.appfood.databinding.ActivityOrderHistoryBinding
 import com.example.appfood.domain.model.Order
 import com.example.appfood.presentation.adapter.OrderAdapter
 import com.example.appfood.presentation.viewmodel.HistoryViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
@@ -27,7 +22,9 @@ class OrderHistoryActivity : AppCompatActivity() {
     private lateinit var adapter: OrderAdapter
     private val viewModel: HistoryViewModel by viewModels()
 
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
+        super.onBackPressed()
         val intent = Intent(this, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
         startActivity(intent)
@@ -61,9 +58,6 @@ class OrderHistoryActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         adapter = OrderAdapter(
-            onRatingClick = { order ->
-                showRatingDialog(order)
-            },
             onItemClick = { order ->
                 openOrderDetail(order)
             }
@@ -83,6 +77,7 @@ class OrderHistoryActivity : AppCompatActivity() {
         binding.layoutEmpty.visibility = View.GONE
 
         lifecycleScope.launch {
+            delay(500) // Thêm delay tối thiểu để progress bar hiển thị rõ hơn
             viewModel.orders.collect { orderList ->
                 binding.progressBar.visibility = View.GONE
 
@@ -96,34 +91,5 @@ class OrderHistoryActivity : AppCompatActivity() {
                 }
             }
         }
-    }
-
-    private fun showRatingDialog(order: Order) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_rating, null)
-        val ratingBar = dialogView.findViewById<RatingBar>(R.id.dialogRatingBar)
-        val edtFeedback = dialogView.findViewById<EditText>(R.id.edtFeedback)
-
-        AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setTitle("Đánh giá đơn hàng")
-            .setCancelable(true)
-            .create()
-            .apply {
-                dialogView.findViewById<android.view.View>(R.id.btnSubmitRating).setOnClickListener {
-                    val ratingValue = ratingBar.rating
-                    val feedbackText = edtFeedback.text.toString().trim()
-
-                    if (ratingValue == 0f) {
-                        Toast.makeText(context, "Vui lòng chọn số sao!", Toast.LENGTH_SHORT).show()
-                        return@setOnClickListener
-                    }
-
-                    viewModel.updateRating(order.id, ratingValue, feedbackText) {
-                        Toast.makeText(context, "Cảm ơn bạn đã đánh giá!", Toast.LENGTH_SHORT).show()
-                        dismiss()
-                    }
-                }
-                show()
-            }
     }
 }

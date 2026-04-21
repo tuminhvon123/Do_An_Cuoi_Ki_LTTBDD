@@ -52,10 +52,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:visibility="gone"
+        android:elevation="8dp"
+        style="?android:attr/progressBarStyleLarge"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/layoutHeader" />
+        app:layout_constraintTop_toTopOf="@id/recyclerOrders" />
 
     <!-- Empty State: Hiển thị khi không có đơn hàng nào -->
     <LinearLayout

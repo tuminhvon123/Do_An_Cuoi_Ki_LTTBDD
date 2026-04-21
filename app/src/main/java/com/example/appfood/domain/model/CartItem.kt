@@ -12,7 +12,10 @@ data class CartItem(
     val foodImageUrl: String = "",
     val quantity: Int = 1,
     val topping: String = "",
-    val addedAt: Long = System.currentTimeMillis()
+    val addedAt: Long = System.currentTimeMillis(),
+    var rating: Float = 0f,
+    var feedback: String = "",
+    var isRated: Boolean = false
 ) : Serializable {
     fun getTotalPrice(): Double {
         return foodPrice * quantity

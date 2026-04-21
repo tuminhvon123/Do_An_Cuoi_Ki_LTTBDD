@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/txtFoodTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Tên món ăn"
+        android:textAlignment="center"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Đánh giá của bạn"
+        android:textAlignment="center"
+        android:textColor="@color/text_gray"
+        android:textSize="14sp" />
+
+    <RatingBar
+        android:id="@+id/dialogRatingBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:numStars="5"
+        android:stepSize="1" />
+
+    <EditText
+        android:id="@+id/edtFeedback"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="16dp"
+        android:background="@android:drawable/editbox_background"
+        android:gravity="top"
+        android:hint="Nhập nhận xét của bạn về món ăn..."
+        android:padding="12dp"
+        android:textSize="14sp" />
+
+    <Button
+        android:id="@+id/btnSubmitRating"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/teal_primary"
+        android:text="Gửi đánh giá"
+        android:textAllCaps="false"
+        android:textColor="@color/white" />
+
+</LinearLayout>
