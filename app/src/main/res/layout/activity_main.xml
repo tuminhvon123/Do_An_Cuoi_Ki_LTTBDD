@@ -153,7 +153,15 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:clipToPadding="false"
-                android:orientation="horizontal" />
+                android:paddingBottom="10dp"
+                android:orientation="horizontal"
+                android:scrollbars="horizontal"
+                android:scrollbarStyle="outsideInset"
+                android:scrollbarSize="6dp"
+                android:scrollbarThumbHorizontal="@drawable/scrollbar_thumb_teal"
+                android:scrollbarTrackHorizontal="@drawable/scrollbar_track_teal"
+                android:fadeScrollbars="false"
+                android:overScrollMode="always" />
 
             <!-- Food Section -->
             <TextView

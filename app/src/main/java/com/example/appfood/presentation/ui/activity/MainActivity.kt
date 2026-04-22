@@ -248,12 +248,13 @@ class MainActivity : AppCompatActivity() {
     private fun initCategories() {
         categoryList.clear()
         categoryList.add(Category(0, "Tất cả", "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=200"))
+        categoryList.add(Category(1, "Pizza", "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200"))
         categoryList.add(Category(4, "Gà Rán", "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=200"))
         categoryList.add(Category(2, "Burger", "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=200"))
         categoryList.add(Category(5, "Mì Ý", "https://images.unsplash.com/photo-1516100882582-96c3a05fe590?w=200"))
-        categoryList.add(Category(7, "Cơm", "https://images.unsplash.com/photo-1512058560366-cd2427ffad74?w=200"))
+        categoryList.add(Category(7, "Cơm", "https://jollibee.com.vn/media/catalog/product/cache/11f3e6435b23ab624dc55c2d3fe9479d/g/_/g_gi_n_vui_v_-_5.png"))
         categoryList.add(Category(6, "Ăn kèm", "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?w=200"))
-        categoryList.add(Category(3, "Đồ uống", "https://images.unsplash.com/photo-1544145945-f904253d0c71?w=200"))
+        categoryList.add(Category(3, "Đồ uống", "https://jollibee.com.vn//media/catalog/category/thucuong.png"))
         categoryList.add(Category(8, "Tráng miệng", "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=200"))
     }
 
@@ -291,6 +292,7 @@ class MainActivity : AppCompatActivity() {
         }
         binding.recyclerViewCategory.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         binding.recyclerViewCategory.adapter = categoryAdapter
+        binding.recyclerViewCategory.isHorizontalScrollBarEnabled = true
 
         foodAdapter = FoodAdapter(mutableListOf()) { food ->
             val intent = Intent(this, DetailActivity::class.java)
