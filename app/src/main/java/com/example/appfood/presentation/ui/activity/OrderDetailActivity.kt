@@ -49,7 +49,7 @@ class OrderDetailActivity : AppCompatActivity() {
 
         order?.let {
             displayOrderInfo(it)
-            // Load ratings for items in this order
+            // cap nhat danh gia cho order
             lifecycleScope.launch {
                 viewModel.loadRatingsForOrder(it.items, currentUserId, it.id)
                 displayOrderItems(it)

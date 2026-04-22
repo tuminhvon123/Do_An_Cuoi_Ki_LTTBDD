@@ -64,11 +64,9 @@ class FirebaseOrderRepository @Inject constructor() : OrderRepository {
 
         try {
             val query = if (isAdmin) {
-                // 👑 ADMIN → lấy tất cả
                 ordersRef
             } else {
-                // 👤 USER → lọc theo userId
-                ordersRef.orderByChild("userId").equalTo(userId)
+                ordersRef.orderByChild("userId").equalTo(userId) // user thi loc them id
             }
 
             query.addValueEventListener(object : ValueEventListener {

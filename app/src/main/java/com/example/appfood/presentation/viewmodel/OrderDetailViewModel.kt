@@ -18,7 +18,6 @@ class OrderDetailViewModel @Inject constructor(
         return try {
             val result = foodRatingRepository.addRating(rating)
             if (result.isSuccess) {
-                // Update the cart item's rating locally
                 cartItem.rating = rating.rating
                 cartItem.feedback = rating.feedback
                 cartItem.isRated = true

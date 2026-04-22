@@ -47,11 +47,9 @@ class OrderRepositoryImpl @Inject constructor(
         val db = FirebaseFirestore.getInstance()
 
         val query = if (isAdmin) {
-            // 👑 ADMIN → lấy tất cả
             db.collection("orders")
         } else {
-            // 👤 USER → lọc theo userId
-            db.collection("orders").whereEqualTo("userId", userId)
+            db.collection("orders").whereEqualTo("userId", userId) // user thi loc them id
         }
 
         val listener = query.addSnapshotListener { snapshot, error ->

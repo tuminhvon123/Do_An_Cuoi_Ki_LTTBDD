@@ -25,3 +25,4 @@ data class Order(
     fun isDineIn(): Boolean = deliveryType == "dine_in"
     fun isTakeaway(): Boolean = deliveryType == "takeaway"
 }
+

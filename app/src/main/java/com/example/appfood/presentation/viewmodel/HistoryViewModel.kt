@@ -46,7 +46,7 @@ class HistoryViewModel @Inject constructor(
         val userId = if (!isAdmin) {
             currentUserId ?: getGuestUserId()
         } else {
-            "ADMIN" // giá trị giả, không dùng để filter
+            "ADMIN"
         }
 
         if (!isAdmin && userId == null) {
@@ -62,10 +62,8 @@ class HistoryViewModel @Inject constructor(
                 orderRepository.getUserOrders(userId!!).collect { orderList ->
 
                     val result = if (isAdmin) {
-                        // 👑 ADMIN → lấy tất cả (KHÔNG filter)
                         orderList
                     } else {
-                        // 👤 USER → giữ nguyên
                         orderList
                     }
 

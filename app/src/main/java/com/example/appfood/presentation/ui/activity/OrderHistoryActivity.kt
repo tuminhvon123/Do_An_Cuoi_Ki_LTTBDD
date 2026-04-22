@@ -85,12 +85,13 @@ class OrderHistoryActivity : AppCompatActivity() {
         intent.putExtra("order_data", order)
         startActivity(intent)
     }
+
     private fun observeData() {
         binding.progressBar.visibility = View.VISIBLE
         binding.layoutEmpty.visibility = View.GONE
 
         lifecycleScope.launch {
-            delay(500) // Thêm delay tối thiểu để progress bar hiển thị rõ hơn
+            delay(500) // Thêm delay = progress bar
             viewModel.orders.collect { orderList ->
                 binding.progressBar.visibility = View.GONE
 

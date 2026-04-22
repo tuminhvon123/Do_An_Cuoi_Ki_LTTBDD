@@ -10,3 +10,4 @@ interface OrderRepository {
     suspend fun updateOrderStatus(orderId: String, status: String): Result<Unit>
     suspend fun updateOrderRating(orderId: String, rating: Float, feedback: String): Result<Unit>
 }
+
